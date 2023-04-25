@@ -1,0 +1,129 @@
+syntax = "proto3";
+package event_protocol;
+
+import "name.proto";
+import "event.proto";
+
+message EventSystemConfigs {
+  uint64 max_event_queue_length = 1;
+}
+
+message GetEventSystemConfigsRequest { }
+message GetEventSystemConfigsResponse {
+  EventSystemConfigs configs = 1;
+}
+
+// 注册事件类型
+message RegisterEventTypeRequest {
+  cashmere.Name name = 1;
+  bool has_echo = 2;
+  string description = 3;
+}
+message RegisterEventTypeResponse {
+  // 成功返回 type id
+  string result = 1;
+}
+
+// 取消注册事件类型
+message DeregisterEventTypeRequest {
+  string type_id = 1;
+}
+message DeregisterEventTypeResponse {
+  // 成功返回 type id
+  string result = 1;
+}
+
+// 注册发送者， 发送者需要先注册，然后才能上线
+message RegisterEmitterRequest {
+  // 不能重名
+  string envent_type = 1;
+  cashmere.Name name = 2;
+  string description = 3;
+
+}
+message RegisterEmitterResponse {
+  // 成功返回 emitter id
+  string result = 1;
+}
+
+// 注销发送者
+message DeregisterEmitterRequest {
+    string emitter_id =1;
+}
+message DeregisterEmitterResponse {
+  // 成功返回 listener id
+    string result = 1;
+}
+
+// 注册发送者， 发送者需要先注册，然后才能上线
+message RegisterListenerRequest {
+  // 不能重名
+  string envent_type = 1;
+  cashmere.Name name = 2;
+  string description = 3;
+
+}
+message RegisterListenerResponse {
+  // 成功返回 listener id
+  string result = 1;
+}
+
+// 注销监听者
+message DeregisterListenerRequest {
+    string listener_id =1;
+}
+message DeregisterListenerResponse {
+  // 成功返回 listener id
+    string result = 1;
+}
+
+// 上线发送者, 服务器->发送者单向流
+// 1. 用于监听反馈事件
+// 2. 用于反馈发送者状态
+message OnlineEmitterRequest {
+  string emitter_id = 1;
+}
+message OnlineEmitterResponse {
+  // 成功返回 emitter id
+  string emitter_id = 1;
+  Event echo = 2;
+}
+
+// 列出所有事件类型
+message ListEventTypeRequest {
+}
+message ListEventTypeResponse {
+  repeated EventType event_types = 1;
+}
+
+// 列出事件类型的发送者
+message ListEmitterRequest {
+  string type_id = 1;
+}
+message ListEmitterResponse {
+  repeated EventEmitter emitters = 1;
+}
+
+// 列出事件类型的监听者
+message ListListenerRequest {
+  string type_id = 1;
+}
+message ListListenerResponse {
+  repeated EventListener listeners = 1;
+}
+
+// 取得发送者
+message GetEventEmitterRequest {
+  string emitter_id = 1;
+}
+message GetEventEmitterResponse {
+  EventEmitter emitter = 1;
+}
+
+// 取得监听者
+message GetEventListenerRequest {
+  string listener_id = 1;
+}
+message GetEventListenerResponse {
+  EventListener listener = 1;
+}

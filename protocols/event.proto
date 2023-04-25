@@ -1,0 +1,71 @@
+syntax = "proto3";
+package event_protocol;
+
+import "name.proto";
+
+message EventType {
+  string type_id = 1;
+  cashmere.Name name = 2;
+  bool has_echo = 3;
+  string description = 4;
+}
+
+message Event {
+  string type_id = 1;
+  string emitter_id = 2;
+  uint64 serial_number = 3;
+  uint64 timestamp = 4;
+  // bson
+  bytes context = 5;
+}
+
+message EventEmitter {
+  string emitter_id = 1;
+  string type_id = 2;
+  cashmere.Name name = 3;
+  string description = 4;
+  bool is_online = 5;
+}
+
+message EventListener {
+  string listener_id = 1;
+  string type_id = 2;
+  cashmere.Name name = 3;
+  string description = 4;
+  bool is_online = 5;
+}
+
+
+// 发送事件, 单次调用，不是持续发送
+message  EmitEventRequest {
+  Event event = 1;
+}
+message  EmitEventResponse {
+  // 成功返回 event id
+  string result = 1;
+}
+
+// 发送事件，并监听反馈
+message  EmitEventAndListenEchoRequest {
+  Event event = 1;
+}
+message EmitEventAndListenEchoResponse {
+  Event event = 1;
+}
+
+// 监听事件类型, 持续监听
+message  ListenEventTypeRequest {
+  string type_id = 1;
+}
+message  ListenEventTypeResponse {
+  Event event = 1;
+}
+
+// 发送反馈事件
+message  EmitEchoRequest {
+  Event event = 1;
+}
+message  EmitEchoResponse {
+  // 成功返回 event id
+  string result = 1;
+}
