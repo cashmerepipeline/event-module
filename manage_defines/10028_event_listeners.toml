@@ -9,7 +9,7 @@ name_map = { zh = "事情监听者", en = "event_listeners" }
 # 数据描写 或者 模式
 schema = [
   { data_type = "Int32", name_map = { zh = "事件类型", en = "type_id" }, removed = false },
-  { data_type = "Bool", name_map = { zh = "是否在线", en = "is_online" }, removed = false },
+  { data_type = "List", name_map = { zh = "可监听类", en = "listenable_types" }, removed = false },
 ]
 
 

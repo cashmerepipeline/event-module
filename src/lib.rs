@@ -21,6 +21,7 @@ i18n!("locales");
 // pub use event_type::*;
 // pub use event::*;
 // pub use event_echo_type::*;
+mod dispatch_local_set;
 
 pub mod service_handles;
 

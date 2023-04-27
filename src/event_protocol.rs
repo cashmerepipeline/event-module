@@ -1,6 +1,8 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EventType {
+    /// 所有发送事件类型的编号都是奇数，所有反馈事件类型的编号都是偶数
+    /// 反馈事件编号 = 发送事件编号 + 1
     #[prost(string, tag="1")]
     pub type_id: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
@@ -21,7 +23,7 @@ pub struct Event {
     pub serial_number: u64,
     #[prost(uint64, tag="4")]
     pub timestamp: u64,
-    /// bson
+    /// bson, 大小应当限制在64kb以内
     #[prost(bytes="vec", tag="5")]
     pub context: ::prost::alloc::vec::Vec<u8>,
 }
@@ -36,8 +38,6 @@ pub struct EventEmitter {
     pub name: ::core::option::Option<::manage_define::cashmere::Name>,
     #[prost(string, tag="4")]
     pub description: ::prost::alloc::string::String,
-    #[prost(bool, tag="5")]
-    pub is_online: bool,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -79,6 +79,8 @@ pub struct EmitEventAndListenEchoResponse {
 /// 监听事件类型, 持续监听
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListenEventTypeRequest {
+    #[prost(string, tag="2")]
+    pub listener_id: ::prost::alloc::string::String,
     #[prost(string, tag="1")]
     pub type_id: ::prost::alloc::string::String,
 }
@@ -86,18 +88,6 @@ pub struct ListenEventTypeRequest {
 pub struct ListenEventTypeResponse {
     #[prost(message, optional, tag="1")]
     pub event: ::core::option::Option<Event>,
-}
-/// 发送反馈事件
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EmitEchoRequest {
-    #[prost(message, optional, tag="1")]
-    pub event: ::core::option::Option<Event>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EmitEchoResponse {
-    /// 成功返回 event id
-    #[prost(string, tag="1")]
-    pub result: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EventSystemConfigs {
