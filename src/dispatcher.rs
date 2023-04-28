@@ -1,19 +1,22 @@
-use log::{error, info};
+use cash_result::{OperationResult, operation_failed};
+use futures::channel::mpsc::SendError;
+use log::{info, warn, error};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc::{channel, Sender};
 
 use parking_lot::RwLock;
 
+use crate::event_echo_wrapper::EventEchoWrapper;
 use crate::{dispatch_local_set::get_dispatcher_localset, event_protocol::Event};
 
 // 每个注册的监听者可能在多个地方登录, 所以需要有这里每个监听编号对应多个发送
-type ListenerSenderMapType = HashMap<String, Arc<RwLock<HashMap<usize, Sender<Event>>>>>;
+type ListenerSenderMapType = HashMap<String, Arc<RwLock<HashMap<usize, Sender<EventEchoWrapper>>>>>;
 
 #[derive(Clone)]
 pub struct EventDispatcher {
     pub type_id: String,
-    pub dispatch_sender: Sender<Event>,
+    pub dispatch_sender: Sender<EventEchoWrapper>,
     // 每个注册的监听者可能在多个地方登录
     pub listener_sender_map: Arc<RwLock<ListenerSenderMapType>>,
 }
@@ -23,7 +26,7 @@ impl EventDispatcher {
     pub fn new(type_id: String) -> Self {
         // 创建事件接收通道
         info!("{}: {}", t!("开始创建事件类型转发通道"), type_id);
-        let (receive_sender, mut receive_receiver) = channel::<Event>(32);
+        let (receive_sender, mut receive_receiver) = channel::<EventEchoWrapper>(8);
         let listener_senders_map = ListenerSenderMapType::new();
         let listener_sender_map_arc = Arc::new(RwLock::new(listener_senders_map));
 
@@ -50,9 +53,11 @@ impl EventDispatcher {
                             };
                         }
                     }
-                    // listener_senders.iter().for_each(|(listener_id, listener_sender)| async {
-                    //     listener_sender.send(event.clone()).await;
-                    // });
+                    // listener_senders
+                    //     .iter()
+                    //     .for_each(|(listener_id, listener_sender)| async {
+                    //         listener_sender.send(event).await;
+                    //     });
                 }
             }
 
@@ -62,7 +67,11 @@ impl EventDispatcher {
         new_dispatcher
     }
 
-    pub fn add_listener_sender(&mut self, listener_id: &String, listener_sender: Sender<Event>) {
+    pub fn add_listener_sender(
+        &mut self,
+        listener_id: &String,
+        listener_sender: Sender<EventEchoWrapper>,
+    ) {
         info!("{}: {}", t!("添加事件监听器"), listener_id);
 
         let mut listener_sender_map = self.listener_sender_map.write();
@@ -92,5 +101,17 @@ impl EventDispatcher {
         } else {
             warn!("{}: {}", t!("事件监听器不存在"), listener_id);
         }
+    }
+
+    pub async fn send_event(
+        &self,
+        event_echo_wrapper: EventEchoWrapper,
+    ) -> Result<(), OperationResult> {
+        if let Err(e) = self.dispatch_sender.send(event_echo_wrapper).await{
+            log::error!("{}: {}", t!("事件发送失败"), e);
+            return Err(operation_failed("send_event", t!("事件发送失败")));
+        }
+
+        Ok(())
     }
 }

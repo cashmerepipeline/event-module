@@ -9,19 +9,19 @@ i18n!("locales");
 // mod event;
 // mod event_type;
 // mod event_echo_type;
-// mod types;
+mod types;
 // mod listener;
 // mod dispatcher;
 // mod emitter;
-// mod emitters_map;
-// mod event_message;
-
+mod emitter_delegators_map;
+mod event_echo_wrapper;
 // pub mod event_service;
 
 // pub use event_type::*;
 // pub use event::*;
 // pub use event_echo_type::*;
 mod dispatch_local_set;
+mod emitter_delegator;
 
 pub mod service_handles;
 

@@ -41,13 +41,3 @@ pub fn get_dispatcher(type_id: &String) -> Option<DispatcherType> {
         Some(new_dispatcher)
     }
 }
-
-// 取得事件分发器
-pub async fn get_dispatcher_receive_sender(type_id: &String) -> Option<Sender<Event>> {
-    if let Some(dispatcher_arc) = get_dispatcher(&type_id.to_owned()) {
-        let dispatcher = dispatcher_arc.read();
-        Some(dispatcher.dispatch_sender.clone())
-    } else {
-        None
-    }
-}

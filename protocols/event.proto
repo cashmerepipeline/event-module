@@ -41,9 +41,9 @@ message EventListener {
 message  EmitEventRequest {
   Event event = 1;
 }
+// 返回反馈事件流
 message  EmitEventResponse {
-  // 成功返回 event id
-  string result = 1;
+  Event event = 1;
 }
 
 // 发送事件，并监听反馈

@@ -1,3 +1,4 @@
+use chrono::Utc;
 use tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
@@ -14,6 +15,7 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
+use crate::event_echo_wrapper::EventEchoWrapper;
 use crate::event_protocol::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
@@ -92,7 +94,7 @@ pub trait HandleListenEventType {
         let mut dispatcher = dispatcher_arc.write();
 
         // 创建监听事件管道
-        let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<Event>(4);
+        let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventEchoWrapper>(4);
         dispatcher.add_listener_sender(&listener_id, event_tx);
 
         // 创建返回流
@@ -100,9 +102,24 @@ pub trait HandleListenEventType {
 
         // 转发事件
         tokio::spawn(async move {
-            while let Some(event) = event_rx.recv().await {
-                let mut resp = ListenEventTypeResponse { event: Some(event) };
+            while let Some(event_echo_wraper) = event_rx.recv().await {
+                let mut resp = ListenEventTypeResponse {
+                    event: Some(event_echo_wraper.event.clone()),
+                };
                 resp_tx.send(Ok(resp)).await.unwrap();
+
+                if let Some(echo_sender) = event_echo_wraper.echo_sender {
+                    let echo_event = Event {
+                        type_id: event_echo_wraper.event.type_id,
+                        emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
+                            + 1)
+                        .to_string(),
+                        timestamp: Utc::now().timestamp_millis() as u64,
+                        serial_number: event_echo_wraper.event.serial_number + 1,
+                        context: vec![],
+                    };
+                    echo_sender.send(echo_event).await.unwrap();
+                }
             }
         });
 

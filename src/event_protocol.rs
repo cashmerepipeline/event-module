@@ -59,11 +59,11 @@ pub struct EmitEventRequest {
     #[prost(message, optional, tag="1")]
     pub event: ::core::option::Option<Event>,
 }
+/// 返回反馈事件流
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EmitEventResponse {
-    /// 成功返回 event id
-    #[prost(string, tag="1")]
-    pub result: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub event: ::core::option::Option<Event>,
 }
 /// 发送事件，并监听反馈
 #[derive(Clone, PartialEq, ::prost::Message)]
