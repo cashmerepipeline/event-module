@@ -6,7 +6,7 @@ use manage_define::general_field_ids::*;
 use managers::traits::ManagerTrait;
 
 use crate::dispatchers_map::{get_dispatchers_map, get_dispatcher};
-use crate::{event_protocol::EventType, manage_ids::EVENT_TYPES_MANAGE_ID};
+use crate::{prototols::EventType, manage_ids::EVENT_TYPES_MANAGE_ID};
 
 /// 初始化事件服务
 pub async fn initialize_event_service() -> Result<(), OperationResult> {

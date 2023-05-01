@@ -1,6 +1,6 @@
 use tokio::sync::mpsc::Sender;
 
-use crate::event_protocol::Event;
+use crate::prototols::Event;
 
 #[derive(Clone)]
 pub struct EventEchoWrapper {

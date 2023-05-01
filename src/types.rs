@@ -4,7 +4,7 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 
 use crate::emitter_delegator::EmitterDelegator;
-use crate::event_protocol::{Event, EventListener, EventEmitter};
+use crate::prototols::{Event, EventListener, EventEmitter};
 
 // pub type EventTypesMap = BTreeMap<String, EventType>;
 

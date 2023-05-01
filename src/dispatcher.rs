@@ -8,7 +8,7 @@ use tokio::sync::mpsc::{channel, Sender};
 use parking_lot::RwLock;
 
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::{dispatch_local_set::get_dispatcher_localset, event_protocol::Event};
+use crate::{dispatch_local_set::get_dispatcher_localset, prototols::Event};
 
 // 每个注册的监听者可能在多个地方登录, 所以需要有这里每个监听编号对应多个发送
 type ListenerSenderMapType = HashMap<String, Arc<RwLock<HashMap<usize, Sender<EventEchoWrapper>>>>>;

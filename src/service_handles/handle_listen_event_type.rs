@@ -16,7 +16,7 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::event_protocol::*;
+use crate::prototols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 

@@ -9,19 +9,21 @@ Modified: !date!
 use std::sync::Arc;
 
 // use log::{error, info, warn};
-use async_trait::async_trait;
+use tonic::async_trait;
 use bson;
 use parking_lot::RwLock;
 
-use super::{Manager, ManagerInner, ManagerTrait};
+use managers::{Manager, ManagerInner, ManagerTrait};
 
 use cash_core::{manage_from_document, Manage};
 use cash_result::*;
 use manage_define::manage_ids::*;
 
-use crate::declare_get_manager;
+use managers::declare_get_manager;
 use bson::Document;
 use manage_define::manage_ids::MANAGES_MANAGE_ID;
+
+use crate::manage_ids::EVENT_TYPES_MANAGE_ID;
 
 #[derive(Default)]
 pub struct EventTypesManager;

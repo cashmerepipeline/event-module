@@ -13,7 +13,7 @@ use service_common_handles::name_utils::validate_name;
 use service_common_handles::UnaryResponseResult;
 
 use crate::dispatchers_map::get_dispatcher;
-use crate::event_protocol::*;
+use crate::prototols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 

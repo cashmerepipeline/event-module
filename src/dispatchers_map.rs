@@ -4,7 +4,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 
 use crate::dispatcher::EventDispatcher;
-use crate::event_protocol::Event;
+use crate::prototols::Event;
 
 type DispatcherType = Arc<RwLock<EventDispatcher>>;
 type DispatcherMapType = HashMap<String, DispatcherType>;

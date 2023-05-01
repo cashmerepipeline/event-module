@@ -9,19 +9,21 @@ Modified: !date!
 use std::sync::Arc;
 
 // use log::{error, info, warn};
-use async_trait::async_trait;
 use bson;
+use bson::Document;
 use parking_lot::RwLock;
+use tonic::async_trait;
 
-use super::{Manager, ManagerInner, ManagerTrait};
+use managers::{Manager, ManagerInner, ManagerTrait};
 
 use cash_core::{manage_from_document, Manage};
 use cash_result::*;
 use manage_define::manage_ids::*;
 
-use crate::declare_get_manager;
-use bson::Document;
 use manage_define::manage_ids::MANAGES_MANAGE_ID;
+use managers::declare_get_manager;
+
+use crate::manage_ids::EVENT_EMITTERS_MANAGE_ID;
 
 #[derive(Default)]
 pub struct EventEmittersManager;
@@ -44,7 +46,7 @@ impl ManagerTrait for EventEmittersManager {
     }
 
     fn get_manager_id(&self) -> i32 {
-        EVENT_HANDLES_MANAGE_ID
+        EVENT_EMITTERS_MANAGE_ID
     }
 
     fn get_manager_name(&self) -> String {
@@ -61,7 +63,7 @@ impl ManagerTrait for EventEmittersManager {
                 EVENT_EMITTERS_MANAGE.clone().unwrap()
             } else {
                 let collection_name = MANAGES_MANAGE_ID.to_string();
-                let id_str = EVENT_HANDLES_MANAGE_ID.to_string();
+                let id_str = EVENT_EMITTERS_MANAGE_ID.to_string();
                 let m_doc = match entity::get_entity_by_id(&collection_name, &id_str).await {
                     Ok(r) => r,
                     Err(e) => panic!("{} {}", e.operation(), e.details()),
@@ -79,7 +81,7 @@ impl ManagerTrait for EventEmittersManager {
                 EVENT_EMITTERS_MANAGE_DOCUMENT.clone().unwrap()
             } else {
                 let collection_name = MANAGES_MANAGE_ID.to_string();
-                let id_str = EVENT_HANDLES_MANAGE_ID.to_string();
+                let id_str = EVENT_EMITTERS_MANAGE_ID.to_string();
                 let m_doc = match entity::get_entity_by_id(&collection_name, &id_str).await {
                     Ok(r) => r,
                     Err(e) => panic!("{} {}", e.operation(), e.details()),
@@ -91,4 +93,3 @@ impl ManagerTrait for EventEmittersManager {
         }
     }
 }
-

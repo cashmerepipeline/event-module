@@ -9,17 +9,19 @@ Modified: !date!
 use std::sync::Arc;
 
 // use log::{error, info, warn};
-use async_trait::async_trait;
+use tonic::async_trait;
 use bson;
 use parking_lot::RwLock;
 
-use super::{Manager, ManagerInner, ManagerTrait};
+use crate::{field_ids::EVENT_LISTENERS_LISTENABLE_TYPES_FIELD_ID, manage_ids::EVENT_LISTENERS_MANAGE_ID};
+
+use managers::{Manager, ManagerInner, ManagerTrait};
 
 use cash_core::{manage_from_document, Manage};
 use cash_result::*;
 use manage_define::manage_ids::*;
 
-use crate::declare_get_manager;
+use managers::declare_get_manager;
 use bson::Document;
 use manage_define::manage_ids::MANAGES_MANAGE_ID;
 
@@ -44,7 +46,7 @@ impl ManagerTrait for EventListenersManager {
     }
 
     fn get_manager_id(&self) -> i32 {
-        EVENT_HANDLES_MANAGE_ID
+        EVENT_LISTENERS_MANAGE_ID
     }
 
     fn get_manager_name(&self) -> String {
@@ -61,7 +63,7 @@ impl ManagerTrait for EventListenersManager {
                 EVENT_LISTENERS_MANAGE.clone().unwrap()
             } else {
                 let collection_name = MANAGES_MANAGE_ID.to_string();
-                let id_str = EVENT_HANDLES_MANAGE_ID.to_string();
+                let id_str = EVENT_LISTENERS_MANAGE_ID.to_string();
                 let m_doc = match entity::get_entity_by_id(&collection_name, &id_str).await {
                     Ok(r) => r,
                     Err(e) => panic!("{} {}", e.operation(), e.details()),
@@ -79,7 +81,7 @@ impl ManagerTrait for EventListenersManager {
                 EVENT_LISTENERS_MANAGE_DOCUMENT.clone().unwrap()
             } else {
                 let collection_name = MANAGES_MANAGE_ID.to_string();
-                let id_str = EVENT_HANDLES_MANAGE_ID.to_string();
+                let id_str = EVENT_LISTENERS_MANAGE_ID.to_string();
                 let m_doc = match entity::get_entity_by_id(&collection_name, &id_str).await {
                     Ok(r) => r,
                     Err(e) => panic!("{} {}", e.operation(), e.details()),

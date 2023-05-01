@@ -24,10 +24,12 @@ mod dispatch_local_set;
 mod emitter_delegator;
 
 pub mod service_handles;
-
-pub mod event_protocol;
 pub mod field_ids;
 pub mod manage_ids;
+pub mod managers;
+pub mod prototols{
+  include!("event_module.rs");
+}
 
 mod dispatcher;
 pub mod dispatchers_map;
