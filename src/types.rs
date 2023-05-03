@@ -4,9 +4,9 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 
 use crate::emitter_delegator::EmitterDelegator;
-use crate::protocols::{Event, EventListener, EventEmitter};
+use crate::protocols::{Event, EventListener, EventEmitter, EventType};
 
-// pub type EventTypesMap = BTreeMap<String, EventType>;
+pub type EventTypesMap = BTreeMap<String, Arc<EventType>>;
 
 // 事件缓存
 // pub type EventDeQue = Arc<RwLock<VecDeque<Event>>>;

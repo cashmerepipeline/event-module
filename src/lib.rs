@@ -2,7 +2,7 @@
 extern crate rust_i18n;
 i18n!("locales");
 
-// mod event_types_map;
+mod event_types_map;
 // mod event_queue;
 // mod event_queue_map;
 // mod listeners_map;

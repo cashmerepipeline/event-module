@@ -1,7 +1,9 @@
-use crate::event_type::EventType;
+use std::sync::Arc;
+use crate::protocols::EventType;
 use crate::event_types_map::get_event_types_map;
 
-pub fn get_event_types() -> Vec<EventType> {
+
+pub fn get_event_types() -> Vec<Arc<EventType>> {
     let event_types_map_arc = get_event_types_map();
     let event_types_map = event_types_map_arc.read();
 

@@ -16,6 +16,7 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_types_map::get_event_serial_number;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 use crate::protocols::*;
@@ -34,7 +35,14 @@ pub trait HandleEmitEvent {
         if event.is_none() {
             return Err(Status::invalid_argument(t!("事件不能为空")));
         }
-        let event = event.as_ref().unwrap();
+
+        let mut event = event.as_ref().unwrap().to_owned();
+        if let Some(serial_number) = get_event_serial_number(&event.type_id).await{
+            debug!("{}: {} {} {}", t!("取得事件序号"), event.type_id, event.emitter_id, serial_number);
+            event.serial_number = serial_number;
+        } else {
+            return Err(Status::invalid_argument(t!("事件类型不支持，或者取得事件序号失败")));
+        }
 
         if !view::can_collection_read(
             &account_id,
