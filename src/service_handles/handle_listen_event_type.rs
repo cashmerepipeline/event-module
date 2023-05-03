@@ -121,18 +121,18 @@ pub trait HandleListenEventType {
                 };
                 resp_tx.send(Ok(resp)).await.unwrap();
 
-                // if let Some(echo_sender) = event_echo_wraper.echo_sender {
-                //     let echo_event = Event {
-                //         type_id: event_echo_wraper.event.type_id,
-                //         emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
-                //             + 1)
-                //         .to_string(),
-                //         timestamp: Utc::now().timestamp_millis() as u64,
-                //         serial_number: event_echo_wraper.event.serial_number + 1,
-                //         context: vec![],
-                //     };
-                //     echo_sender.send(echo_event).await.unwrap();
-                // }
+                if let Some(echo_sender) = event_echo_wraper.echo_sender {
+                    let echo_event = Event {
+                        type_id: event_echo_wraper.event.type_id,
+                        emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
+                            + 1)
+                        .to_string(),
+                        timestamp: Utc::now().timestamp_millis() as u64,
+                        serial_number: event_echo_wraper.event.serial_number + 1,
+                        context: vec![],
+                    };
+                    echo_sender.send(echo_event).await.unwrap();
+                }
             }
         });
 

@@ -115,7 +115,7 @@ pub trait HandleEmitEvent {
         // 发送
         let event_echo_wrapper = EventEchoWrapper {
             event: event.clone(),
-            echo_sender: Some(1u64),
+            echo_sender: Some(echo_tx),
         };
         
         debug!("{}, {}", t!("开始发送事件"), event.serial_number);

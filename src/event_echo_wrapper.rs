@@ -5,5 +5,5 @@ use crate::protocols::Event;
 #[derive(Clone)]
 pub struct EventEchoWrapper {
   pub event: Event,
-  pub echo_sender: Option<u64>,
+  pub echo_sender: Option<Sender<Event>>,
 }
