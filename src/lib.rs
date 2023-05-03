@@ -27,12 +27,14 @@ pub mod service_handles;
 pub mod field_ids;
 pub mod manage_ids;
 pub mod managers;
-pub mod prototols{
+pub mod protocols{
   include!("event_module.rs");
 }
 
 mod dispatcher;
 pub mod dispatchers_map;
+
+mod echo_sender_map;
 
 pub use initialize_event_service::*;
 mod initialize_event_service;

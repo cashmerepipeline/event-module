@@ -34,59 +34,47 @@ message DeregisterEventTypeResponse {
 }
 
 // 注册发送者， 发送者需要先注册，然后才能上线
-message RegisterEmitterRequest {
+message RegisterEventEmitterRequest {
   // 不能重名
-  string envent_type = 1;
+  string event_type = 1;
   cashmere.Name name = 2;
   string description = 3;
 
 }
-message RegisterEmitterResponse {
+message RegisterEventEmitterResponse {
   // 成功返回 emitter id
   string result = 1;
 }
 
 // 注销发送者
-message DeregisterEmitterRequest {
+message DeregisterEventEmitterRequest {
     string emitter_id =1;
 }
-message DeregisterEmitterResponse {
+message DeregisterEventEmitterResponse {
   // 成功返回 listener id
     string result = 1;
 }
 
 // 注册发送者， 发送者需要先注册，然后才能上线
-message RegisterListenerRequest {
+message RegisterEventListenerRequest {
   // 不能重名
-  string envent_type = 1;
+  string event_type = 1;
   cashmere.Name name = 2;
   string description = 3;
 
 }
-message RegisterListenerResponse {
+message RegisterEventListenerResponse {
   // 成功返回 listener id
   string result = 1;
 }
 
 // 注销监听者
-message DeregisterListenerRequest {
+message DeregisterEventListenerRequest {
     string listener_id =1;
 }
-message DeregisterListenerResponse {
+message DeregisterEventListenerResponse {
   // 成功返回 listener id
     string result = 1;
-}
-
-// 上线发送者, 服务器->发送者单向流
-// 1. 用于监听反馈事件
-// 2. 用于反馈发送者状态
-message OnlineEmitterRequest {
-  string emitter_id = 1;
-}
-message OnlineEmitterResponse {
-  // 成功返回 emitter id
-  string emitter_id = 1;
-  Event echo = 2;
 }
 
 // 列出所有事件类型

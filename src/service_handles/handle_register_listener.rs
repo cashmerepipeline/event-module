@@ -10,7 +10,7 @@ use view;
 use service_common_handles::name_utils::validate_name;
 use service_common_handles::UnaryResponseResult;
 
-use crate::prototols::*;
+use crate::protocols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 
@@ -18,11 +18,11 @@ use crate::manage_ids::*;
 pub trait HandleRegisterEventListener {
     async fn handle_register_event_listener(
         &self,
-        request: Request<RegisterListenerRequest>,
-    ) -> UnaryResponseResult<RegisterListenerResponse> {
+        request: Request<RegisterEventListenerRequest>,
+    ) -> UnaryResponseResult<RegisterEventListenerResponse> {
         let (account_id, _groups, role_group) = request_account_context(request.metadata());
 
-        let event_type = &request.get_ref().envent_type;
+        let event_type = &request.get_ref().event_type;
         let name = &request.get_ref().name;
         let description = &request.get_ref().description;
 
@@ -75,7 +75,7 @@ pub trait HandleRegisterEventListener {
             .await;
 
         match result {
-            Ok(_r) => Ok(Response::new(RegisterListenerResponse {
+            Ok(_r) => Ok(Response::new(RegisterEventListenerResponse {
                 result: new_id,
             })),
             Err(e) => Err(Status::aborted(format!(

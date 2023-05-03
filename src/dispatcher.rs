@@ -1,16 +1,19 @@
-use cash_result::{OperationResult, operation_failed};
+use cash_result::{operation_failed, OperationResult};
 use futures::channel::mpsc::SendError;
-use log::{info, warn, error};
+use log::{debug, error, info, warn};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc::{channel, Sender};
+use tokio::task::LocalSet;
 
 use parking_lot::RwLock;
 
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::{dispatch_local_set::get_dispatcher_localset, prototols::Event};
+use crate::{dispatch_local_set::get_dispatcher_localset, protocols::Event};
 
+// 不同注册的监听者可能监听同一类型的事件，所以需要多个监听者
 // 每个注册的监听者可能在多个地方登录, 所以需要有这里每个监听编号对应多个发送
+// {listener_id: {instance_id: sender1, instance_id: sender2, ...}}
 type ListenerSenderMapType = HashMap<String, Arc<RwLock<HashMap<usize, Sender<EventEchoWrapper>>>>>;
 
 #[derive(Clone)]
@@ -26,42 +29,66 @@ impl EventDispatcher {
     pub fn new(type_id: String) -> Self {
         // 创建事件接收通道
         info!("{}: {}", t!("开始创建事件类型转发通道"), type_id);
-        let (receive_sender, mut receive_receiver) = channel::<EventEchoWrapper>(8);
+
+        let (dispatch_sender, mut dispatch_receiver) = channel::<EventEchoWrapper>(8);
         let listener_senders_map = ListenerSenderMapType::new();
         let listener_sender_map_arc = Arc::new(RwLock::new(listener_senders_map));
 
         let new_dispatcher = EventDispatcher {
             type_id: type_id.clone(),
-            dispatch_sender: receive_sender.clone(),
+            dispatch_sender: dispatch_sender.clone(),
             listener_sender_map: listener_sender_map_arc.clone(),
         };
 
-        // 启动事件转发
-        let dispatch_local_set = get_dispatcher_localset();
-        let local_set = dispatch_local_set.write();
-        local_set.spawn_local(async move {
-            while let Some(event) = receive_receiver.recv().await {
-                {
-                    let listener_senders_arc = listener_sender_map_arc.clone();
-                    let listener_senders = listener_senders_arc.read();
+        // 事件转发线程
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
 
-                    while let Some((_t, senders_arc)) = listener_senders.iter().next() {
+        std::thread::spawn(move || {
+            let local_set = LocalSet::new();
+            local_set.spawn_local(async move {
+                while let event_wrapper = dispatch_receiver.recv().await {
+
+                    let event_wrapper = event_wrapper.unwrap();
+                    let type_id = event_wrapper.event.type_id.clone();
+                    let serial_number = event_wrapper.event.serial_number.clone();
+                    let emitter_id = event_wrapper.event.emitter_id.clone();
+
+                    debug!("{}: {}-{}", t!("转发事件"), type_id, serial_number);
+
+                    let listener_senders_map = listener_sender_map_arc.read();
+
+                    // 事件转发到不同的监听者
+                    for listeners in listener_senders_map.iter() {
+                        // if sender.is_none() {
+                        //     break;
+                        // }
+
+                        let (listener_id, senders_arc) = listeners;
+                        debug!("{}: {}-{}", t!("转发到监听者"), listener_id, serial_number);
+
                         let senders = senders_arc.read();
-                        for (_index, s) in senders.iter().next() {
-                            if let Err(e) = s.send(event.clone()).await {
+                        // 事件转发到同一个监听者的不同实例
+                        for (index, s) in senders.iter() {
+                            debug!("{}: {}-{}", t!("转发到监听者实例"), index, serial_number);
+
+                            // 发送事件到终点
+                            if let Err(e) = s.send(event_wrapper.clone()).await {
                                 error!("{}: {}", t!("事件转发失败"), e);
                             };
+
                         }
                     }
-                    // listener_senders
-                    //     .iter()
-                    //     .for_each(|(listener_id, listener_sender)| async {
-                    //         listener_sender.send(event).await;
-                    //     });
-                }
-            }
 
-            info!("EventDispatcher: {} is closed", type_id);
+                    debug!("{}: {}-{}", t!("转发事件完成"), type_id, serial_number);
+                }
+
+                info!("EventDispatcher: {} is closed", type_id);
+            });
+
+            rt.block_on(local_set);
         });
 
         new_dispatcher
@@ -101,17 +128,5 @@ impl EventDispatcher {
         } else {
             warn!("{}: {}", t!("事件监听器不存在"), listener_id);
         }
-    }
-
-    pub async fn send_event(
-        &self,
-        event_echo_wrapper: EventEchoWrapper,
-    ) -> Result<(), OperationResult> {
-        if let Err(e) = self.dispatch_sender.send(event_echo_wrapper).await{
-            log::error!("{}: {}", t!("事件发送失败"), e);
-            return Err(operation_failed("send_event", t!("事件发送失败")));
-        }
-
-        Ok(())
     }
 }

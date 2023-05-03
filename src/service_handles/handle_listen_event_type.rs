@@ -1,4 +1,5 @@
 use chrono::Utc;
+use log::debug;
 use tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
@@ -16,13 +17,13 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::prototols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
+use crate::protocols::*;
 
 #[async_trait]
 pub trait HandleListenEventType {
-    async fn handle_register_event_type(
+    async fn handle_listen_event_type(
         &self,
         request: Request<ListenEventTypeRequest>,
     ) -> StreamResponseResult<ListenEventTypeResponse> {
@@ -77,14 +78,19 @@ pub trait HandleListenEventType {
                 )))
             }
         };
-
-        if !listener_entity
-            .get_array(EVENT_LISTENERS_LISTENABLE_TYPES_FIELD_ID.to_string())
-            .unwrap()
-            .contains(&bson::to_bson(listener_id).unwrap())
-        {
-            return Err(Status::aborted(t!("监听器不可监听该事件类型")));
-        };
+        // 事件类型需要匹配
+        if let Ok(id) = listener_entity.get_str(EVENT_LISTENERS_TYPE_ID_FIELD_ID.to_string()) {
+            if &id.to_string() != type_id {
+                return Err(Status::aborted(format!(
+                    "{}: {}: {}, {}: {}",
+                    t!("不可监听该事件类型"),
+                    t!("监听者"),
+                    listener_id,
+                    t!("事件类型"),
+                    type_id
+                )));
+            }
+        }
 
         // 取得转发器
         let mut dispatcher_arc = match get_dispatcher(type_id) {
@@ -102,24 +108,31 @@ pub trait HandleListenEventType {
 
         // 转发事件
         tokio::spawn(async move {
-            while let Some(event_echo_wraper) = event_rx.recv().await {
+            while let event_echo_wraper = event_rx.recv().await {
+                if event_echo_wraper.is_none() {
+                    break;
+                }
+
+                let event_echo_wraper = event_echo_wraper.unwrap();
+                debug!("{}: {}", t!("监听到事件"), event_echo_wraper.event.serial_number);
+
                 let mut resp = ListenEventTypeResponse {
                     event: Some(event_echo_wraper.event.clone()),
                 };
                 resp_tx.send(Ok(resp)).await.unwrap();
 
-                if let Some(echo_sender) = event_echo_wraper.echo_sender {
-                    let echo_event = Event {
-                        type_id: event_echo_wraper.event.type_id,
-                        emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
-                            + 1)
-                        .to_string(),
-                        timestamp: Utc::now().timestamp_millis() as u64,
-                        serial_number: event_echo_wraper.event.serial_number + 1,
-                        context: vec![],
-                    };
-                    echo_sender.send(echo_event).await.unwrap();
-                }
+                // if let Some(echo_sender) = event_echo_wraper.echo_sender {
+                //     let echo_event = Event {
+                //         type_id: event_echo_wraper.event.type_id,
+                //         emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
+                //             + 1)
+                //         .to_string(),
+                //         timestamp: Utc::now().timestamp_millis() as u64,
+                //         serial_number: event_echo_wraper.event.serial_number + 1,
+                //         context: vec![],
+                //     };
+                //     echo_sender.send(echo_event).await.unwrap();
+                // }
             }
         });
 

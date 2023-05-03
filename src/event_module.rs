@@ -132,77 +132,61 @@ pub struct DeregisterEventTypeResponse {
 }
 /// 注册发送者， 发送者需要先注册，然后才能上线
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RegisterEmitterRequest {
+pub struct RegisterEventEmitterRequest {
     /// 不能重名
     #[prost(string, tag="1")]
-    pub envent_type: ::prost::alloc::string::String,
+    pub event_type: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
     pub name: ::core::option::Option<::manage_define::cashmere::Name>,
     #[prost(string, tag="3")]
     pub description: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RegisterEmitterResponse {
+pub struct RegisterEventEmitterResponse {
     /// 成功返回 emitter id
     #[prost(string, tag="1")]
     pub result: ::prost::alloc::string::String,
 }
 /// 注销发送者
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeregisterEmitterRequest {
+pub struct DeregisterEventEmitterRequest {
     #[prost(string, tag="1")]
     pub emitter_id: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeregisterEmitterResponse {
+pub struct DeregisterEventEmitterResponse {
     /// 成功返回 listener id
     #[prost(string, tag="1")]
     pub result: ::prost::alloc::string::String,
 }
 /// 注册发送者， 发送者需要先注册，然后才能上线
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RegisterListenerRequest {
+pub struct RegisterEventListenerRequest {
     /// 不能重名
     #[prost(string, tag="1")]
-    pub envent_type: ::prost::alloc::string::String,
+    pub event_type: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
     pub name: ::core::option::Option<::manage_define::cashmere::Name>,
     #[prost(string, tag="3")]
     pub description: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RegisterListenerResponse {
+pub struct RegisterEventListenerResponse {
     /// 成功返回 listener id
     #[prost(string, tag="1")]
     pub result: ::prost::alloc::string::String,
 }
 /// 注销监听者
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeregisterListenerRequest {
+pub struct DeregisterEventListenerRequest {
     #[prost(string, tag="1")]
     pub listener_id: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeregisterListenerResponse {
+pub struct DeregisterEventListenerResponse {
     /// 成功返回 listener id
     #[prost(string, tag="1")]
     pub result: ::prost::alloc::string::String,
-}
-/// 上线发送者, 服务器->发送者单向流
-/// 1. 用于监听反馈事件
-/// 2. 用于反馈发送者状态
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OnlineEmitterRequest {
-    #[prost(string, tag="1")]
-    pub emitter_id: ::prost::alloc::string::String,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OnlineEmitterResponse {
-    /// 成功返回 emitter id
-    #[prost(string, tag="1")]
-    pub emitter_id: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="2")]
-    pub echo: ::core::option::Option<Event>,
 }
 /// 列出所有事件类型
 #[derive(Clone, PartialEq, ::prost::Message)]

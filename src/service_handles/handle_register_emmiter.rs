@@ -10,7 +10,7 @@ use view;
 use service_common_handles::name_utils::validate_name;
 use service_common_handles::UnaryResponseResult;
 
-use crate::prototols::*;
+use crate::protocols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 
@@ -18,11 +18,11 @@ use crate::manage_ids::*;
 pub trait HandleRegisterEventEmitter {
     async fn handle_register_event_emitter(
         &self,
-        request: Request<RegisterEmitterRequest>,
-    ) -> UnaryResponseResult<RegisterEmitterResponse> {
+        request: Request<RegisterEventEmitterRequest>,
+    ) -> UnaryResponseResult<RegisterEventEmitterResponse> {
         let (account_id, _groups, role_group) = request_account_context(request.metadata());
 
-        let event_type = &request.get_ref().envent_type;
+        let event_type = &request.get_ref().event_type;
         let name = &request.get_ref().name;
         let description = &request.get_ref().description;
 
@@ -75,7 +75,7 @@ pub trait HandleRegisterEventEmitter {
             .await;
 
         match result {
-            Ok(_r) => Ok(Response::new(RegisterEmitterResponse {
+            Ok(_r) => Ok(Response::new(RegisterEventEmitterResponse {
                 result: new_id,
             })),
             Err(e) => Err(Status::aborted(format!(

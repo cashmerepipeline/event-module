@@ -1,7 +1,7 @@
 
 use std::sync::mpsc::Sender;
 
-use crate::prototols::Event;
+use crate::protocols::Event;
 
 #[derive(Debug, Clone)]
 pub struct EmitterDelegator {

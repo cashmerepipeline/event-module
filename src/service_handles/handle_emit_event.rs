@@ -1,3 +1,4 @@
+use log::debug;
 use tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
@@ -15,9 +16,9 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::prototols::*;
 use crate::field_ids::*;
 use crate::manage_ids::*;
+use crate::protocols::*;
 
 #[async_trait]
 pub trait HandleEmitEvent {
@@ -82,18 +83,17 @@ pub trait HandleEmitEvent {
             }
         };
 
-        if !emitter_entity
-            .get_array(EVENT_EMITTERS_EMITTABLE_EVENT_TYPES_FIELD_ID.to_string())
-            .unwrap()
-            .contains(&bson::to_bson(&event.type_id.clone()).unwrap())
-        {
-            return Err(Status::aborted(format!(
-                "{}: {}, {}",
-                t!("发送者不可发送该事件类型"),
-                event.emitter_id,
-                event.type_id
-            )));
-        };
+        // 事件类型需要匹配
+        if let Ok(id) = emitter_entity.get_str(EVENT_EMITTERS_TYPE_ID_FIELD_ID.to_string()) {
+            if id.to_string() != event.type_id {
+                return Err(Status::aborted(format!(
+                    "{}: {}, {}",
+                    t!("发送者不可发送该事件类型"),
+                    event.emitter_id,
+                    event.type_id
+                )));
+            }
+        }
 
         // 取得转发器
         let mut dispatcher_arc = match get_dispatcher(&event.type_id) {
@@ -101,8 +101,8 @@ pub trait HandleEmitEvent {
             None => return Err(Status::aborted(format!("{}", t!("获取转发器失败 ")))),
         };
 
-        let event_sender = {
-        let dispatcher = dispatcher_arc.read();
+        let dispatch_sender = {
+            let dispatcher = dispatcher_arc.read();
             dispatcher.dispatch_sender.clone()
         };
 
@@ -115,19 +115,19 @@ pub trait HandleEmitEvent {
         // 发送
         let event_echo_wrapper = EventEchoWrapper {
             event: event.clone(),
-            echo_sender: Some(echo_tx),
+            echo_sender: Some(1u64),
         };
-        if let Err(e) = event_sender.send(event_echo_wrapper).await{
-            return Err(Status::aborted(format!(
-                "{}: {}",
-                t!("发送事件失败 "),
-                e
-            )))
+        
+        debug!("{}, {}", t!("开始发送事件"), event.serial_number);
+        if let Err(e) = dispatch_sender.send(event_echo_wrapper).await {
+            return Err(Status::aborted(format!("{}: {}", t!("发送事件失败 "), e)));
         };
+        debug!("{}, {}", t!("完成发送事件"), event.serial_number);
 
         // 转发事件
         tokio::spawn(async move {
             while let Some(event) = echo_rx.recv().await {
+                debug!("{}, {}", t!("接收到事件反馈"), event.serial_number);
                 let mut resp = EmitEventResponse { event: Some(event) };
                 resp_tx.send(Ok(resp)).await.unwrap();
             }
