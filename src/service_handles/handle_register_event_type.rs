@@ -13,9 +13,10 @@ use service_common_handles::name_utils::validate_name;
 use service_common_handles::UnaryResponseResult;
 
 use crate::dispatchers_map::get_dispatcher;
-use crate::protocols::*;
+use crate::event_types_map::register_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;
+use crate::protocols::*;
 
 #[async_trait]
 pub trait HandleRegisterEventType {
@@ -77,34 +78,34 @@ pub trait HandleRegisterEventType {
         if new_id % 2 == 0 {
             new_entity_doc.insert(ID_FIELD_ID.to_string(), (new_id + 1).to_string());
         }
-        
-        // 更新分发器表
-        if let None = get_dispatcher(&new_id.to_string()) {
-            // 更新分发器表失败
-            return Err(Status::aborted(format!(
-                "{}: {}",
-                t!("更新分发器表失败"),
-                new_id
-            )));
-        }
-        // 如果有反馈，更新反馈表
-        if *has_echo {
-            if let  None = get_dispatcher(&(new_id + 1).to_string()) {
-                // 更新分发器表失败
-                return Err(Status::aborted(format!(
-                    "{}: {}",
-                    t!("更新分发器表失败"),
-                    new_id + 1
-                )));
-            }
-        }
 
         let result = manager
             .sink_entity(&mut new_entity_doc, &account_id, &role_group)
             .await;
 
         match result {
-            Ok(_r) => Ok(Response::new(RegisterEventTypeResponse { result: new_id.to_string() })),
+            Ok(_r) => {
+                // 更新缓存
+                let new_event_type = EventType {
+                    type_id: new_id.to_string(),
+                    name: Some(name.clone()),
+                    has_echo: *has_echo,
+                    description: description.clone(),
+                };
+                if let None = register_event_type(new_event_type){
+                    // 更新缓存失败
+                    return Err(Status::aborted(format!(
+                        "{}: {}, {}",
+                        t!("更新缓存失败"),
+                        t!("事件类型"),
+                        t!("可能需要重新启动事件服务")
+                    )));
+                };
+
+                Ok(Response::new(RegisterEventTypeResponse {
+                    result: new_id.to_string(),
+                }))
+            }
             Err(e) => Err(Status::aborted(format!(
                 "{} {}",
                 e.operation(),

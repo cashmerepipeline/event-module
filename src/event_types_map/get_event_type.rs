@@ -9,6 +9,7 @@ use crate::manage_ids::EVENT_TYPES_MANAGE_ID;
 use crate::protocols::EventType;
 
 pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
+    // 如果存在，直接返回缓存
     {
         let event_types_map_arc = get_event_types_map();
         let event_types_map = event_types_map_arc.read();
@@ -19,6 +20,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
         }
     }
 
+    // 如果不存在，从数据库中获取
     let manager = {
         let majar = majordomo::get_majordomo().await;
         majar
@@ -57,6 +59,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
 
         return Some(event_type_arc);
     } else {
+        // 数据库中不存在
         return None;
     };
 }
