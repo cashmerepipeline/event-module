@@ -17,6 +17,7 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 use crate::dispatcher;
 use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_types_map::get_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 use crate::protocols::*;
@@ -41,14 +42,15 @@ pub trait HandleListenEventType {
         {
             return Err(Status::unauthenticated("用户不具有可写权限"));
         }
+        
+        // 事件类型存在检查
+        if get_event_type(type_id).await.is_none() {
+            return Err(Status::not_found(t!("事件类型不存在")));
+        }
 
         let majordomo_arc = get_majordomo().await;
         let listener_manager = majordomo_arc
             .get_manager_by_id(EVENT_LISTENERS_MANAGE_ID)
-            .await
-            .unwrap();
-        let event_type_manager = majordomo_arc
-            .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
             .await
             .unwrap();
 
@@ -58,12 +60,6 @@ pub trait HandleListenEventType {
             .await
         {
             return Err(Status::not_found(t!("监听器不存在")));
-        }
-        if !event_type_manager
-            .entity_exists(&bson::doc! {ID_FIELD_ID.to_string():type_id.clone()})
-            .await
-        {
-            return Err(Status::not_found(t!("事件类型不存在")));
         }
 
         // 检查是否可监听
@@ -107,6 +103,7 @@ pub trait HandleListenEventType {
         let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(4);
 
         // 转发事件
+        let listener_id = listener_id.clone();
         tokio::spawn(async move {
             while let event_echo_wraper = event_rx.recv().await {
                 if event_echo_wraper.is_none() {
@@ -114,7 +111,11 @@ pub trait HandleListenEventType {
                 }
 
                 let event_echo_wraper = event_echo_wraper.unwrap();
-                debug!("{}: {}", t!("监听到事件"), event_echo_wraper.event.serial_number);
+                debug!(
+                    "{}: {}",
+                    t!("监听到事件"),
+                    event_echo_wraper.event.serial_number
+                );
 
                 let mut resp = ListenEventTypeResponse {
                     event: Some(event_echo_wraper.event.clone()),
@@ -122,17 +123,19 @@ pub trait HandleListenEventType {
                 resp_tx.send(Ok(resp)).await.unwrap();
 
                 if let Some(echo_sender) = event_echo_wraper.echo_sender {
+                    let echo_name = format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
                     let echo_event = Event {
                         type_id: event_echo_wraper.event.type_id,
                         emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
                             + 1)
                         .to_string(),
+                        emitter_instance_name: echo_name,
                         timestamp: Utc::now().timestamp_millis() as u64,
                         serial_number: event_echo_wraper.event.serial_number + 1,
                         context: vec![],
                     };
                     echo_sender.send(echo_event).await.unwrap();
-                }
+                };
             }
         });
 

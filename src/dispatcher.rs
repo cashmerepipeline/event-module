@@ -50,7 +50,6 @@ impl EventDispatcher {
             let local_set = LocalSet::new();
             local_set.spawn_local(async move {
                 while let event_wrapper = dispatch_receiver.recv().await {
-
                     let event_wrapper = event_wrapper.unwrap();
                     let type_id = event_wrapper.event.type_id.clone();
                     let serial_number = event_wrapper.event.serial_number.clone();
@@ -69,16 +68,30 @@ impl EventDispatcher {
                         let (listener_id, senders_arc) = listeners;
                         debug!("{}: {}-{}", t!("转发到监听者"), listener_id, serial_number);
 
-                        let senders = senders_arc.read();
+                        let mut senders = senders_arc.write();
+                        // 检查接收端是否关闭，如果关闭，移除发送器
+                        let keys = senders
+                            .iter()
+                            .filter(|(i, s)| s.is_closed())
+                            .map(|(i, s)| *i)
+                            .collect::<Vec<usize>>();
+                        keys.iter().for_each(|(i)| {
+                            if senders.remove(i).is_none() {
+                                warn!("{}: {} {}", t!("移除已关闭的发送者失败"), listener_id, i);
+                            };
+                        });
+
                         // 事件转发到同一个监听者的不同实例
-                        for (index, s) in senders.iter() {
+                        for (index, sender) in senders.iter() {
                             debug!("{}: {}-{}", t!("转发到监听者实例"), index, serial_number);
+                            if sender.is_closed() {
+                                continue;
+                            }
 
                             // 发送事件到终点
-                            if let Err(e) = s.send(event_wrapper.clone()).await {
+                            if let Err(e) = sender.send(event_wrapper.clone()).await {
                                 error!("{}: {}", t!("事件转发失败"), e);
                             };
-
                         }
                     }
 
@@ -120,7 +133,7 @@ impl EventDispatcher {
     pub fn remove_listener_sender(&mut self, listener_id: &String, sender_index: usize) {
         info!("{}: {}", t!("移除事件监听器"), listener_id);
 
-        let mut listener_sender_map = self.listener_sender_map.write();
+        let listener_sender_map = self.listener_sender_map.write();
         if listener_sender_map.contains_key(listener_id) {
             let senders_arc = listener_sender_map.get(listener_id).unwrap();
             let mut senders = senders_arc.write();

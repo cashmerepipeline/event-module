@@ -15,6 +15,7 @@ message EventType {
 message Event {
   string type_id = 1;
   string emitter_id = 2;
+  string emitter_instance_name = 6;
   uint64 serial_number = 3;
   uint64 timestamp = 4;
   // bson, 大小应当限制在64kb以内

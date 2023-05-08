@@ -46,12 +46,12 @@ pub async fn initialize_event_service() -> Result<(), OperationResult> {
     //     }
     // }
 
-    thread::spawn(|| {
-        let event_localset = get_dispatcher_localset();
-        let lset = event_localset.read();
-        lset.run_until(future::pending::<()>());
-    })
-    .join();
+    // thread::spawn(|| {
+    //     let event_localset = get_dispatcher_localset();
+    //     let lset = event_localset.read();
+    //     lset.run_until(future::pending::<()>());
+    // })
+    // .join();
 
     Ok(())
 }

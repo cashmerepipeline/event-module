@@ -19,6 +19,8 @@ pub struct Event {
     pub type_id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub emitter_id: ::prost::alloc::string::String,
+    #[prost(string, tag="6")]
+    pub emitter_instance_name: ::prost::alloc::string::String,
     #[prost(uint64, tag="3")]
     pub serial_number: u64,
     #[prost(uint64, tag="4")]
