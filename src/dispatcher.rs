@@ -9,7 +9,7 @@ use tokio::task::LocalSet;
 use parking_lot::RwLock;
 
 use crate::event_echo_wrapper::EventEchoWrapper;
-use crate::{dispatch_local_set::get_dispatcher_localset, protocols::Event};
+use crate::protocols::Event;
 
 // 不同注册的监听者可能监听同一类型的事件，所以需要多个监听者
 // 每个注册的监听者可能在多个地方登录, 所以需要有这里每个监听编号对应多个发送

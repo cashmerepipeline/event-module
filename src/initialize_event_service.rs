@@ -7,7 +7,6 @@ use futures::FutureExt;
 use manage_define::general_field_ids::*;
 use managers::traits::ManagerTrait;
 
-use crate::dispatch_local_set::get_dispatcher_localset;
 use crate::dispatchers_map::{get_dispatcher, get_dispatchers_map};
 use crate::{manage_ids::EVENT_TYPES_MANAGE_ID, protocols::EventType};
 

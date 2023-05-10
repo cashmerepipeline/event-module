@@ -3,24 +3,9 @@ extern crate rust_i18n;
 i18n!("locales");
 
 mod event_types_map;
-// mod event_queue;
-// mod event_queue_map;
-// mod listeners_map;
-// mod event;
-// mod event_type;
-// mod event_echo_type;
 mod types;
-// mod listener;
-// mod dispatcher;
-// mod emitter;
 mod emitter_delegators_map;
 mod event_echo_wrapper;
-// pub mod event_service;
-
-// pub use event_type::*;
-// pub use event::*;
-// pub use event_echo_type::*;
-mod dispatch_local_set;
 mod emitter_delegator;
 
 pub mod service_handles;
@@ -33,8 +18,6 @@ pub mod protocols{
 
 mod dispatcher;
 pub mod dispatchers_map;
-
-mod echo_sender_map;
 
 pub use initialize_event_service::*;
 mod initialize_event_service;
