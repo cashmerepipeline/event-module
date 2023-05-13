@@ -7,6 +7,8 @@ mod types;
 mod emitter_delegators_map;
 mod event_echo_wrapper;
 mod emitter_delegator;
+mod event_services;
+mod type_listeners_map;
 
 pub mod service_handles;
 pub mod field_ids;
@@ -17,7 +19,7 @@ pub mod protocols{
 }
 
 mod dispatcher;
-pub mod dispatchers_map;
+pub mod type_dispatcher_map;
 
 pub use initialize_event_service::*;
 mod initialize_event_service;
