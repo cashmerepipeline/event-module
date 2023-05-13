@@ -12,7 +12,7 @@ use view;
 use service_common_handles::name_utils::validate_name;
 use service_common_handles::UnaryResponseResult;
 
-use crate::dispatchers_map::get_dispatcher;
+use crate::type_dispatcher_map::get_dispatcher;
 use crate::event_types_map::register_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;

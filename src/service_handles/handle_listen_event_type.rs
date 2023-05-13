@@ -1,5 +1,6 @@
 use chrono::Utc;
 use log::debug;
+use log::kv::ToValue;
 use tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
@@ -15,12 +16,12 @@ use service_common_handles::name_utils::validate_name;
 use service_common_handles::{ResponseStream, StreamResponseResult};
 
 use crate::dispatcher;
-use crate::dispatchers_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
 use crate::event_types_map::get_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;
 use crate::protocols::*;
+use crate::type_dispatcher_map::get_dispatcher;
 
 #[async_trait]
 pub trait HandleListenEventType {
@@ -42,7 +43,7 @@ pub trait HandleListenEventType {
         {
             return Err(Status::unauthenticated("用户不具有可写权限"));
         }
-        
+
         // 事件类型存在检查
         if get_event_type(type_id).await.is_none() {
             return Err(Status::not_found(t!("事件类型不存在")));
@@ -89,15 +90,14 @@ pub trait HandleListenEventType {
         }
 
         // 取得转发器
-        let mut dispatcher_arc = match get_dispatcher(type_id) {
+        let dispatcher_arc = match get_dispatcher(type_id) {
             Some(r) => r,
             None => return Err(Status::aborted(format!("{}", t!("获取转发器失败 ")))),
         };
-        let mut dispatcher = dispatcher_arc.write();
 
         // 创建监听事件管道
         let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventEchoWrapper>(4);
-        dispatcher.add_listener_sender(&listener_id, event_tx);
+        dispatcher_arc.add_listener_sender(&listener_id, event_tx);
 
         // 创建返回流
         let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(4);
@@ -120,10 +120,36 @@ pub trait HandleListenEventType {
                 let mut resp = ListenEventTypeResponse {
                     event: Some(event_echo_wraper.event.clone()),
                 };
-                resp_tx.send(Ok(resp)).await.unwrap();
+
+                // TODO: 重试发送
+                if let Err(e) = resp_tx.send(Ok(resp)).await {
+                    debug!("{}: {}", t!("发送事件失败"), e);
+                    // 反馈发送失败
+                    if let Some(echo_sender) = event_echo_wraper.echo_sender {
+                        let echo_name =
+                            format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
+                        let echo_event = Event {
+                            type_id: event_echo_wraper.event.type_id,
+                            emitter_id: (event_echo_wraper
+                                .event
+                                .emitter_id
+                                .parse::<u32>()
+                                .unwrap()
+                                + 1)
+                            .to_string(),
+                            emitter_instance_name: echo_name,
+                            timestamp: Utc::now().timestamp_millis() as u64,
+                            serial_number: event_echo_wraper.event.serial_number + 1,
+                            context: "send failed".as_bytes().to_vec(),
+                        };
+                        echo_sender.send(echo_event).await.unwrap();
+                    };
+                    break;
+                };
 
                 if let Some(echo_sender) = event_echo_wraper.echo_sender {
-                    let echo_name = format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
+                    let echo_name =
+                        format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
                     let echo_event = Event {
                         type_id: event_echo_wraper.event.type_id,
                         emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
@@ -132,7 +158,7 @@ pub trait HandleListenEventType {
                         emitter_instance_name: echo_name,
                         timestamp: Utc::now().timestamp_millis() as u64,
                         serial_number: event_echo_wraper.event.serial_number + 1,
-                        context: vec![],
+                        context: "send success".as_bytes().to_vec(),
                     };
                     echo_sender.send(echo_event).await.unwrap();
                 };

@@ -14,7 +14,7 @@ use service_common_handles::name_utils::validate_name;
 use service_common_handles::{ResponseStream, StreamResponseResult};
 
 use crate::dispatcher;
-use crate::dispatchers_map::get_dispatcher;
+use crate::type_dispatcher_map::get_dispatcher;
 use crate::event_echo_wrapper::EventEchoWrapper;
 use crate::event_types_map::get_event_serial_number;
 use crate::field_ids::*;
@@ -104,21 +104,21 @@ pub trait HandleEmitEvent {
         }
 
         // 取得转发器
-        let mut dispatcher_arc = match get_dispatcher(&event.type_id) {
+        let dispatcher_arc = match get_dispatcher(&event.type_id) {
             Some(r) => r,
             None => return Err(Status::aborted(format!("{}", t!("获取转发器失败 ")))),
         };
 
         let dispatch_sender = {
-            let dispatcher = dispatcher_arc.read();
+            let dispatcher = dispatcher_arc;
             dispatcher.dispatch_sender.clone()
         };
 
         // 创建回馈事件管道
-        let (echo_tx, mut echo_rx) = tokio::sync::mpsc::channel::<Event>(4);
+        let (echo_tx, mut echo_rx) = tokio::sync::mpsc::channel::<Event>(16);
 
         // 创建返回流
-        let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(4);
+        let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(16);
 
         // 发送
         let event_echo_wrapper = EventEchoWrapper {
@@ -136,8 +136,12 @@ pub trait HandleEmitEvent {
         tokio::spawn(async move {
             while let Some(event) = echo_rx.recv().await {
                 debug!("{}, {}", t!("接收到事件反馈"), event.serial_number);
-                let mut resp = EmitEventResponse { event: Some(event) };
-                resp_tx.send(Ok(resp)).await.unwrap();
+                let resp = EmitEventResponse { event: Some(event) };
+                if let Err(e) = resp_tx.send(Ok(resp)).await{
+                    debug!("{}: {}", t!("发送事件反馈失败"), e);
+                    // 反馈失败，尝试下一个反馈
+                    continue;
+                };
             }
         });
 
