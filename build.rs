@@ -1,6 +1,6 @@
 fn main() {
     tonic_build::configure()
-        .out_dir("src")
+        .out_dir("src/protocols")
         .build_client(false)
         .build_server(false)
         .extern_path(".cashmere", "::manage_define::cashmere")

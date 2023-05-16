@@ -1,5 +1,5 @@
 syntax = "proto3";
-package event_module;
+package event.cashmere;
 
 import "name.proto";
 import "event.proto";
@@ -15,7 +15,7 @@ message GetEventSystemConfigsResponse {
 
 // 注册事件类型
 message RegisterEventTypeRequest {
-  cashmere.Name name = 1;
+  .cashmere.Name name = 1;
   bool has_echo = 2;
   string description = 3;
 }
@@ -37,7 +37,7 @@ message DeregisterEventTypeResponse {
 message RegisterEventEmitterRequest {
   // 不能重名
   string event_type = 1;
-  cashmere.Name name = 2;
+  .cashmere.Name name = 2;
   string description = 3;
 
 }
@@ -59,7 +59,7 @@ message DeregisterEventEmitterResponse {
 message RegisterEventListenerRequest {
   // 不能重名
   string event_type = 1;
-  cashmere.Name name = 2;
+  .cashmere.Name name = 2;
   string description = 3;
 
 }

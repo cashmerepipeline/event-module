@@ -1,5 +1,5 @@
 syntax = "proto3";
-package event_module;
+package event.cashmere;
 
 import "name.proto";
 
@@ -7,7 +7,7 @@ message EventType {
   // 所有发送事件类型的编号都是奇数，所有反馈事件类型的编号都是偶数
   // 反馈事件编号 = 发送事件编号 + 1
   string type_id = 1;
-  cashmere.Name name = 2;
+  .cashmere.Name name = 2;
   bool has_echo = 3;
   string description = 4;
 }
@@ -25,14 +25,14 @@ message Event {
 message EventEmitter {
   string emitter_id = 1;
   string type_id = 2;
-  cashmere.Name name = 3;
+  .cashmere.Name name = 3;
   string description = 4;
 }
 
 message EventListener {
   string listener_id = 1;
   string type_id = 2;
-  cashmere.Name name = 3;
+  .cashmere.Name name = 3;
   string description = 4;
   bool is_online = 5;
 }

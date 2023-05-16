@@ -1,5 +1,5 @@
 syntax = "proto3";
-package event_module;
+package event.cashmere;
 
 import "event.proto";
 import "event_server.proto";
