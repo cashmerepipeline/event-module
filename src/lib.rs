@@ -5,10 +5,14 @@ i18n!("locales");
 mod event_types_map;
 mod types;
 mod emitter_delegators_map;
-mod event_echo_wrapper;
+mod event_inner_wrapper;
 mod emitter_delegator;
 mod event_services;
 mod type_listeners_map;
+mod event_type_listeners_map;
+mod listener_senders_map;
+mod dispatch_queue;
+mod event_service_configs;
 
 pub mod service_handles;
 pub mod field_ids;

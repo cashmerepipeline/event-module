@@ -16,7 +16,7 @@ use service_common_handles::name_utils::validate_name;
 use service_common_handles::{ResponseStream, StreamResponseResult};
 
 use crate::dispatcher;
-use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;
@@ -96,7 +96,7 @@ pub trait HandleListenEventType {
         };
 
         // 创建监听事件管道
-        let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventEchoWrapper>(4);
+        let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventInnerWrapper>(4);
         dispatcher_arc.add_listener_sender(&listener_id, event_tx);
 
         // 创建返回流

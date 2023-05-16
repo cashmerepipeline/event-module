@@ -4,7 +4,7 @@ use log::info;
 use parking_lot::RwLock;
 use tokio::sync::mpsc::Sender;
 
-use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_inner_wrapper::EventInnerWrapper;
 
 use super::{
     get_type_listener_senders_map, get_type_listeners_senders_map, ListenerSendersMap,
@@ -14,7 +14,7 @@ use super::{
 pub fn add_listener_sender(
     type_id: &String,
     listener_id: &String,
-    listener_sender: Sender<EventEchoWrapper>,
+    listener_sender: Sender<EventInnerWrapper>,
 ) {
     info!("{}: {}", t!("添加事件监听者"), listener_id);
 

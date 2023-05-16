@@ -15,7 +15,7 @@ use service_common_handles::{ResponseStream, StreamResponseResult};
 
 use crate::dispatcher;
 use crate::type_dispatcher_map::get_dispatcher;
-use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_serial_number;
 use crate::field_ids::*;
 use crate::manage_ids::*;
@@ -121,7 +121,7 @@ pub trait HandleEmitEvent {
         let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(16);
 
         // 发送
-        let event_echo_wrapper = EventEchoWrapper {
+        let event_echo_wrapper = EventInnerWrapper {
             event: event.clone(),
             echo_sender: Some(echo_tx),
         };

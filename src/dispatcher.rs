@@ -9,7 +9,7 @@ use tokio::task::LocalSet;
 use parking_lot::RwLock;
 
 use crate::dispatcher;
-use crate::event_echo_wrapper::EventEchoWrapper;
+use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_services::get_event_runtime;
 use crate::type_listeners_map::{
     add_listener_sender, get_type_listener_senders_map, get_type_listeners_map,
@@ -21,7 +21,7 @@ use crate::type_dispatcher_map::{get_dispatcher, get_dispatchers_map};
 #[derive(Clone)]
 pub struct EventDispatcher {
     pub type_id: String,
-    pub dispatch_sender: Sender<EventEchoWrapper>,
+    pub dispatch_sender: Sender<EventInnerWrapper>,
 }
 
 /// 事件分发器
@@ -30,7 +30,7 @@ impl EventDispatcher {
         // 创建事件接收通道
         info!("{}: {}", t!("开始创建事件类型转发通道"), type_id);
 
-        let (dispatch_sender, mut dispatch_receiver) = channel::<EventEchoWrapper>(512);
+        let (dispatch_sender, mut dispatch_receiver) = channel::<EventInnerWrapper>(512);
 
         let new_dispatcher = EventDispatcher {
             type_id: type_id.clone(),
@@ -54,7 +54,7 @@ impl EventDispatcher {
     pub fn add_listener_sender(
         &self,
         listener_id: &String,
-        listener_sender: Sender<EventEchoWrapper>,
+        listener_sender: Sender<EventInnerWrapper>,
     ) {
         let type_id = self.type_id.clone();
         add_listener_sender(&type_id, listener_id, listener_sender);
@@ -68,7 +68,7 @@ impl EventDispatcher {
     }
 }
 
-fn dispatch(event_wrapper: EventEchoWrapper) {
+fn dispatch(event_wrapper: EventInnerWrapper) {
     let type_id = event_wrapper.event.type_id.clone();
     let serial_number: u64 = event_wrapper.event.serial_number;
     let emitter_id = event_wrapper.event.emitter_id.clone();
