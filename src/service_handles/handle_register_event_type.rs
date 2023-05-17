@@ -89,7 +89,6 @@ pub trait HandleRegisterEventType {
                 let new_event_type = EventType {
                     type_id: new_id.to_string(),
                     name: Some(name.clone()),
-                    has_echo: *has_echo,
                     description: description.clone(),
                 };
                 if let None = register_event_type(new_event_type){

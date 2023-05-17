@@ -1,4 +1,7 @@
 pub struct EventServiceConfigs{
+  // 最多同时并发队列
+  pub max_concurrent_queue: u32,
+  
   // 最多允许持续监听的事件类型数量
   pub max_event_type_queue_size: u32,
   

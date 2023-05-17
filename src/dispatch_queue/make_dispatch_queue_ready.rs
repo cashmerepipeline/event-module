@@ -19,7 +19,8 @@ pub fn make_disptch_queue_ready(semaphore: Arc<Semaphore>) {
     rt.spawn(async move {
         loop {
             // 最多同时启动 max_disptch_thread_num 个转发线程
-            semaphore.acquire().await.unwrap();
+            let _ = semaphore.acquire().await.unwrap();
+
             {
                 let event_type_dispatch_queue_map_arc = get_event_type_dispatch_queue_map();
                 let event_type_dispatch_queue_map = event_type_dispatch_queue_map_arc.read();
@@ -41,7 +42,7 @@ pub fn make_disptch_queue_ready(semaphore: Arc<Semaphore>) {
                 }
             }
             // 完成一次循环后，等待一段时间，响应可能拆入新的事件类型
-            tokio::time::sleep(tokio::time::Duration::from_micros(10)).await;
+            // tokio::time::sleep(tokio::time::Duration::from_micros(10)).await;
         }
     });
 }

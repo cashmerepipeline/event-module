@@ -48,7 +48,6 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
         let event_type = EventType {
             type_id: type_id.clone(),
             name: Some(name),
-            has_echo: has_echo,
             description: description,
         };
         let event_type_arc = Arc::new(event_type.clone());
