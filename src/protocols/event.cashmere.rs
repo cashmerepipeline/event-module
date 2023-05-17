@@ -7,8 +7,6 @@ pub struct EventType {
     pub type_id: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
     pub name: ::core::option::Option<::manage_define::cashmere::Name>,
-    #[prost(bool, tag="3")]
-    pub has_echo: bool,
     #[prost(string, tag="4")]
     pub description: ::prost::alloc::string::String,
 }
@@ -28,6 +26,8 @@ pub struct Event {
     /// bson, 大小应当限制在64kb以内
     #[prost(bytes="vec", tag="5")]
     pub context: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bool, tag="7")]
+    pub need_echo: bool,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]

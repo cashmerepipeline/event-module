@@ -22,17 +22,3 @@ fn build_event_type_listeners_map() -> Arc<RwLock<EventTypeListenersMap>> {
     let mut event_type_listeners_map = EventTypeListenersMap::new();
     Arc::new(RwLock::new(event_type_listeners_map))
 }
-
-pub fn get_event_type_listener_map(type_id: &String) -> Arc<RwLock<IndexListenerMap>> {
-    let listeners_map = get_event_type_listeners_map();
-    let mut listeners_map = listeners_map.write();
-
-    match listeners_map.get(type_id) {
-        Some(m) => m.clone(),
-        None => {
-            let new_map = Arc::new(RwLock::new(IndexListenerMap::new()));
-            listeners_map.insert(type_id.clone(), new_map.clone());
-            new_map
-        }
-    }
-}

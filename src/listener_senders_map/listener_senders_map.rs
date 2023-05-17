@@ -5,7 +5,7 @@ use tokio::sync::mpsc::Sender;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 
-pub type InstanceIndexSenderMap = BTreeMap<u32, Sender<EventInnerWrapper>>;
+pub type InstanceIndexSenderMap = BTreeMap<u32, Option<Sender<EventInnerWrapper>>>;
 type ListenerSendersMap = BTreeMap<String, Arc<RwLock<InstanceIndexSenderMap>>>;
 
 static mut LISTENER_SENDERS_MAP: Option<Arc<RwLock<ListenerSendersMap>>> = None;
