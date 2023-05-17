@@ -8,7 +8,6 @@ message EventType {
   // 反馈事件编号 = 发送事件编号 + 1
   string type_id = 1;
   .cashmere.Name name = 2;
-  bool has_echo = 3;
   string description = 4;
 }
 
@@ -20,6 +19,7 @@ message Event {
   uint64 timestamp = 4;
   // bson, 大小应当限制在64kb以内
   bytes context = 5;
+  bool need_echo = 7;
 }
 
 message EventEmitter {

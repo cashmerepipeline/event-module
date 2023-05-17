@@ -105,60 +105,55 @@ pub trait HandleListenEventType {
         // 转发事件
         let listener_id = listener_id.clone();
         tokio::spawn(async move {
-            while let event_echo_wraper = event_rx.recv().await {
-                if event_echo_wraper.is_none() {
-                    break;
-                }
-
-                let event_echo_wraper = event_echo_wraper.unwrap();
-                debug!(
-                    "{}: {}",
-                    t!("监听到事件"),
-                    event_echo_wraper.event.serial_number
-                );
+            while let Some(event_wraper) = event_rx.recv().await {
+                debug!("{}: {}", t!("监听到事件"), event_wraper.event.serial_number);
 
                 let mut resp = ListenEventTypeResponse {
-                    event: Some(event_echo_wraper.event.clone()),
+                    event: Some(event_wraper.event.clone()),
                 };
 
                 // TODO: 重试发送
                 if let Err(e) = resp_tx.send(Ok(resp)).await {
                     debug!("{}: {}", t!("发送事件失败"), e);
                     // 反馈发送失败
-                    if let Some(echo_sender) = event_echo_wraper.echo_sender {
-                        let echo_name =
-                            format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
+                    if let Some(echo_sender) = event_wraper.echo_sender {
+                        let echo_name = format!(
+                            "echo-{}-{}-{}",
+                            listener_id,
+                            event_wraper.event.type_id,
+                            event_wraper.event.emitter_instance_name
+                        );
                         let echo_event = Event {
-                            type_id: event_echo_wraper.event.type_id,
-                            emitter_id: (event_echo_wraper
-                                .event
-                                .emitter_id
-                                .parse::<u32>()
-                                .unwrap()
-                                + 1)
-                            .to_string(),
+                            type_id: event_wraper.event.type_id,
+                            emitter_id: (event_wraper.event.emitter_id.parse::<u32>().unwrap() + 1)
+                                .to_string(),
                             emitter_instance_name: echo_name,
                             timestamp: Utc::now().timestamp_millis() as u64,
-                            serial_number: event_echo_wraper.event.serial_number + 1,
+                            serial_number: event_wraper.event.serial_number + 1,
                             context: "send failed".as_bytes().to_vec(),
+                            need_echo: false,
                         };
                         echo_sender.send(echo_event).await.unwrap();
                     };
                     break;
                 };
 
-                if let Some(echo_sender) = event_echo_wraper.echo_sender {
-                    let echo_name =
-                        format!("echo-{}-{}", listener_id, event_echo_wraper.event.type_id);
+                if let Some(echo_sender) = event_wraper.echo_sender {
+                    let echo_name = format!(
+                        "echo-{}-{}-{}",
+                        listener_id,
+                        event_wraper.event.type_id,
+                        event_wraper.event.emitter_instance_name
+                    );
                     let echo_event = Event {
-                        type_id: event_echo_wraper.event.type_id,
-                        emitter_id: (event_echo_wraper.event.emitter_id.parse::<u32>().unwrap()
-                            + 1)
-                        .to_string(),
+                        type_id: event_wraper.event.type_id,
+                        emitter_id: (event_wraper.event.emitter_id.parse::<u32>().unwrap() + 1)
+                            .to_string(),
                         emitter_instance_name: echo_name,
                         timestamp: Utc::now().timestamp_millis() as u64,
-                        serial_number: event_echo_wraper.event.serial_number + 1,
+                        serial_number: event_wraper.event.serial_number + 1,
                         context: "send success".as_bytes().to_vec(),
+                        need_echo: false,
                     };
                     echo_sender.send(echo_event).await.unwrap();
                 };

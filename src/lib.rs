@@ -4,11 +4,9 @@ i18n!("locales");
 
 mod event_types_map;
 mod types;
-mod emitter_delegators_map;
 mod event_inner_wrapper;
-mod emitter_delegator;
 mod event_services;
-mod type_listeners_map;
+// mod type_listeners_map;
 mod event_type_listeners_map;
 mod listener_senders_map;
 mod dispatch_queue;
@@ -21,7 +19,8 @@ pub mod managers;
 pub mod protocols;
 
 mod dispatcher;
-pub mod type_dispatcher_map;
+mod type_dispatcher_map;
 
+pub use event_service_configs::*;
 pub use initialize_event_service::*;
 mod initialize_event_service;
