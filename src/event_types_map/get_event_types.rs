@@ -8,5 +8,5 @@ pub fn get_event_types() -> Vec<Arc<EventType>> {
     let event_types_map = event_types_map_arc.read();
 
     // 复制返回，提前释放锁
-    event_types_map.values().map(|v| v.clone()).collect()
+    event_types_map.values().cloned().collect()
 }

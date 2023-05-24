@@ -1,7 +1,9 @@
-use manage_define::cashmere::Name;
-use manage_define::general_field_ids::{DESCRIPTIONS_FIELD_ID, ID_FIELD_ID, NAME_MAP_FIELD_ID};
-use managers::ManagerTrait;
 use std::sync::Arc;
+use dependencies_sync::bson;
+
+use manage_define::cashmere::Name;
+use manage_define::general_field_ids::{DESCRIPTIONS_FIELD_ID, NAME_MAP_FIELD_ID};
+use managers::ManagerTrait;
 
 use crate::event_types_map::get_event_types_map;
 use crate::field_ids::EVENT_TYPES_HAS_ECHO_FIELD_ID;
@@ -37,7 +39,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
                 .to_owned(),
         )
         .unwrap();
-        let has_echo = type_doc
+        let _has_echo = type_doc
             .get_bool(EVENT_TYPES_HAS_ECHO_FIELD_ID.to_string())
             .unwrap();
         let description = type_doc
@@ -48,17 +50,17 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
         let event_type = EventType {
             type_id: type_id.clone(),
             name: Some(name),
-            description: description,
+            description,
         };
-        let event_type_arc = Arc::new(event_type.clone());
+        let event_type_arc = Arc::new(event_type);
 
         let event_types_map_arc = get_event_types_map();
         let mut event_types_map = event_types_map_arc.write();
         event_types_map.insert(type_id.clone(), event_type_arc.clone());
 
-        return Some(event_type_arc);
+        Some(event_type_arc)
     } else {
         // 数据库中不存在
-        return None;
-    };
+        None
+    }
 }

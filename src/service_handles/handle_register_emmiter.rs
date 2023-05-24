@@ -1,4 +1,5 @@
-use tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::bson;
 
 use majordomo::{self, get_majordomo};
 use manage_define::general_field_ids::*;
@@ -7,8 +8,8 @@ use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
 use view;
 
-use service_common_handles::name_utils::validate_name;
-use service_common_handles::UnaryResponseResult;
+use service_utils::validate_name;
+use service_utils::types::UnaryResponseResult;
 
 use crate::protocols::*;
 use crate::field_ids::*;
@@ -27,7 +28,7 @@ pub trait HandleRegisterEventEmitter {
         let description = &request.get_ref().description;
 
         if validate_name(name).is_err() {
-            return Err(Status::data_loss(format!("{}", t!("名字不能为空").to_string())));
+            return Err(Status::data_loss(t!("名字不能为空")));
         }
         let name = name.as_ref().unwrap();
 

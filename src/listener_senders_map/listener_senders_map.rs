@@ -1,7 +1,7 @@
 use std::{sync::Arc, collections::BTreeMap};
 
-use parking_lot::RwLock;
-use tokio::sync::mpsc::Sender;
+use dependencies_sync::parking_lot::RwLock;
+use dependencies_sync::tokio::sync::mpsc::Sender;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 
@@ -22,7 +22,7 @@ pub fn get_listener_senders_map() -> Arc<RwLock<ListenerSendersMap>> {
 }
 
 fn build_listener_senders_map() -> Arc<RwLock<ListenerSendersMap>> {
-    let mut listener_senders_map = ListenerSendersMap::new();
+    let listener_senders_map = ListenerSendersMap::new();
     Arc::new(RwLock::new(listener_senders_map))
 }
 
@@ -37,7 +37,7 @@ pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceInde
     }
     {
         // 不存在则创建
-        let mut listener_senders_map = get_listener_senders_map();
+        let listener_senders_map = get_listener_senders_map();
         let mut listener_senders_map = listener_senders_map.write();
         let listener_sender_map = listener_senders_map.get(listender_id);
         if listener_sender_map.is_some() {
@@ -52,6 +52,6 @@ pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceInde
 }
 
 fn build_listener_sender_map() -> Arc<RwLock<InstanceIndexSenderMap>> {
-    let mut listener_sender_map = InstanceIndexSenderMap::new();
+    let listener_sender_map = InstanceIndexSenderMap::new();
     Arc::new(RwLock::new(listener_sender_map))
 }

@@ -1,19 +1,24 @@
-use log::debug;
-use tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::log::debug;
+use dependencies_sync::bson::{self};
+use dependencies_sync::tokio;
+use dependencies_sync::tokio_stream;
+
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
+
 
 use majordomo::{self, get_majordomo};
 
 use manage_define::general_field_ids::*;
-use manage_define::manage_ids::*;
+
 use managers::traits::ManagerTrait;
-use managers::utils::make_new_entity_document;
+
 use request_utils::request_account_context;
 use view;
 
-use service_common_handles::name_utils::validate_name;
-use service_common_handles::{ResponseStream, StreamResponseResult};
 
-use crate::dispatcher;
+use service_utils::types::{ResponseStream, StreamResponseResult};
+
+
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_serial_number;
 use crate::field_ids::*;
@@ -101,7 +106,7 @@ pub trait HandleEmitEvent {
 
         // 事件类型需要匹配
         if let Ok(id) = emitter_entity.get_str(EVENT_EMITTERS_TYPE_ID_FIELD_ID.to_string()) {
-            if id.to_string() != event.type_id {
+            if *id != event.type_id {
                 return Err(Status::aborted(format!(
                     "{}: {}, {}",
                     t!("发送者不可发送该事件类型"),

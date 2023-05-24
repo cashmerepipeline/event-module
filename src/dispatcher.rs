@@ -1,15 +1,15 @@
-use cash_result::{operation_failed, OperationResult};
-use futures::channel::mpsc::SendError;
-use log::{debug, error, info, warn};
-use std::collections::{BTreeMap, HashMap};
-use std::sync::Arc;
-use tokio::sync::mpsc::{channel, Sender};
-use tokio::task::LocalSet;
 
-use parking_lot::RwLock;
+
+use dependencies_sync::log::{info};
+
+
+use dependencies_sync::tokio::sync::mpsc::{channel, Sender};
+
+
+
 use crate::dispatch_queue::add_event_echo_wrapper_to_queue;
 
-use crate::dispatcher;
+
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_services::get_event_runtime;
 use crate::event_type_listeners_map::add_event_type_listener;
@@ -19,8 +19,8 @@ use crate::listener_senders_map::{add_listener_sender, remove_listener_sender};
 //     get_type_listeners_senders_map, remove_listener_sender,
 // };
 
-use crate::protocols::Event;
-use crate::type_dispatcher_map::{get_dispatcher, get_dispatchers_map};
+
+
 
 #[derive(Clone)]
 pub struct EventDispatcher {
@@ -38,7 +38,7 @@ impl EventDispatcher {
 
         let new_dispatcher = EventDispatcher {
             type_id: type_id.clone(),
-            dispatch_sender: dispatch_sender.clone(),
+            dispatch_sender,
         };
 
         // 事件转发线程

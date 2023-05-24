@@ -1,5 +1,5 @@
-use tonic::{async_trait, Request, Response, Status};
-
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::bson;
 use majordomo::{self, get_majordomo};
 
 use manage_define::general_field_ids::*;
@@ -9,10 +9,10 @@ use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
 use view;
 
-use service_common_handles::name_utils::validate_name;
-use service_common_handles::UnaryResponseResult;
+use service_utils::validate_name;
+use service_utils::types::UnaryResponseResult;
 
-use crate::type_dispatcher_map::get_dispatcher;
+
 use crate::event_types_map::register_event_type;
 use crate::field_ids::*;
 use crate::manage_ids::*;
@@ -91,7 +91,7 @@ pub trait HandleRegisterEventType {
                     name: Some(name.clone()),
                     description: description.clone(),
                 };
-                if let None = register_event_type(new_event_type){
+                if register_event_type(new_event_type).is_none(){
                     // 更新缓存失败
                     return Err(Status::aborted(format!(
                         "{}: {}, {}",

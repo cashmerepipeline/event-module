@@ -1,21 +1,24 @@
-use chrono::Utc;
-use log::debug;
-use log::kv::ToValue;
-use tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::chrono::Utc;
+use dependencies_sync::log::debug;
+
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::bson;
+use dependencies_sync::tokio;
+use dependencies_sync::tokio_stream;
 
 use majordomo::{self, get_majordomo};
 
 use manage_define::general_field_ids::*;
-use manage_define::manage_ids::*;
+
 use managers::traits::ManagerTrait;
-use managers::utils::make_new_entity_document;
+
 use request_utils::request_account_context;
 use view;
 
-use service_common_handles::name_utils::validate_name;
-use service_common_handles::{ResponseStream, StreamResponseResult};
 
-use crate::dispatcher;
+use service_utils::types::{ResponseStream, StreamResponseResult};
+
+
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_type;
 use crate::field_ids::*;
@@ -75,6 +78,7 @@ pub trait HandleListenEventType {
                 )))
             }
         };
+
         // 事件类型需要匹配
         if let Ok(id) = listener_entity.get_str(EVENT_LISTENERS_TYPE_ID_FIELD_ID.to_string()) {
             if &id.to_string() != type_id {
@@ -97,7 +101,7 @@ pub trait HandleListenEventType {
 
         // 创建监听事件管道
         let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventInnerWrapper>(4);
-        dispatcher_arc.add_listener_sender(&listener_id, event_tx);
+        dispatcher_arc.add_listener_sender(listener_id, event_tx);
 
         // 创建返回流
         let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(4);
@@ -108,7 +112,7 @@ pub trait HandleListenEventType {
             while let Some(event_wraper) = event_rx.recv().await {
                 debug!("{}: {}", t!("监听到事件"), event_wraper.event.serial_number);
 
-                let mut resp = ListenEventTypeResponse {
+                let resp = ListenEventTypeResponse {
                     event: Some(event_wraper.event.clone()),
                 };
 

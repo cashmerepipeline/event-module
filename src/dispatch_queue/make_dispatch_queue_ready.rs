@@ -1,17 +1,14 @@
 use std::sync::Arc;
 
-use log::warn;
-use parking_lot::{lock_api::RwLock, RawRwLock};
-use tokio::sync::Semaphore;
+
+
+use dependencies_sync::tokio::sync::Semaphore;
 
 use crate::{
-    event_inner_wrapper,
     event_services::get_event_runtime,
-    event_type_listeners_map::{get_event_type_listener_map, get_event_type_listeners_map},
-    listener_senders_map::get_listener_sender_map,
 };
 
-use super::event_type_queue_map::{DispatchQueue, get_event_type_dispatch_queue_map};
+use super::event_type_queue_map::{get_event_type_dispatch_queue_map};
 
 /// 启动转发线程，等待事件转发
 pub fn make_disptch_queue_ready(semaphore: Arc<Semaphore>) {

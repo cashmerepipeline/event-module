@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
-use tokio::runtime::Runtime;
+use dependencies_sync::tokio;
+use dependencies_sync::tokio::runtime::Runtime;
 
-static mut NOTICE_RUNTIME : Option<Arc<Runtime>> = None;
+static mut NOTICE_RUNTIME: Option<Arc<Runtime>> = None;
 
 pub fn get_event_runtime() -> Arc<Runtime> {
     unsafe {

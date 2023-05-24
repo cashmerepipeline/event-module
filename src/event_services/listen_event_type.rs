@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use md5::{Digest, Md5};
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 
 use crate::{event_types_map::get_event_type, listener::Listener, listeners_map::get_event_type_listeners_map};
 

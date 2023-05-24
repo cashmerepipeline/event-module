@@ -1,4 +1,4 @@
-use tokio::sync::mpsc::Sender;
+use dependencies_sync::tokio::sync::mpsc::Sender;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::listener_senders_map::get_first_none_index::get_first_none_index;

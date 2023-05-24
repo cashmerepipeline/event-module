@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::Arc;
 
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 
@@ -22,7 +22,7 @@ pub fn get_event_type_dispatch_queue_map() -> Arc<RwLock<EventTypeDispatchQueueM
 }
 
 fn build_event_type_dispatch_queue_map() -> Arc<RwLock<EventTypeDispatchQueueMap>> {
-    let mut event_type_dispatch_queue_map = EventTypeDispatchQueueMap::new();
+    let event_type_dispatch_queue_map = EventTypeDispatchQueueMap::new();
     Arc::new(RwLock::new(event_type_dispatch_queue_map))
 }
 

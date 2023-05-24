@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 
 use crate::types::EventTypesMap;
 

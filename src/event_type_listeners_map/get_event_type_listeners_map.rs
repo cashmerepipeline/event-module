@@ -1,6 +1,6 @@
 use std::{collections::BTreeMap, sync::Arc};
 
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 
 pub type IndexListenerMap = BTreeMap<u32, Arc<String>>;
 pub type EventTypeListenersMap = BTreeMap<String, Arc<RwLock<IndexListenerMap>>>;
@@ -19,6 +19,6 @@ pub fn get_event_type_listeners_map() -> Arc<RwLock<EventTypeListenersMap>> {
 }
 
 fn build_event_type_listeners_map() -> Arc<RwLock<EventTypeListenersMap>> {
-    let mut event_type_listeners_map = EventTypeListenersMap::new();
+    let event_type_listeners_map = EventTypeListenersMap::new();
     Arc::new(RwLock::new(event_type_listeners_map))
 }

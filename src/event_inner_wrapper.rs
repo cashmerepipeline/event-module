@@ -1,4 +1,4 @@
-use tokio::sync::mpsc::Sender;
+use dependencies_sync::tokio::sync::mpsc::Sender;
 
 use crate::protocols::Event;
 

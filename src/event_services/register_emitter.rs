@@ -3,7 +3,7 @@ use std::hash::Hash;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 
 use md5::{Digest, Md5};
 

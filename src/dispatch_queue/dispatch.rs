@@ -1,10 +1,10 @@
 use crate::dispatch_queue::event_type_queue_map::DispatchQueue;
 use crate::event_services::get_event_runtime;
 use crate::event_type_listeners_map::get_event_type_listener_map;
-use crate::listener_senders_map::{self, get_listener_sender_map};
-use log::{warn, info};
-use parking_lot::lock_api::RwLock;
-use parking_lot::RawRwLock;
+use crate::listener_senders_map::{get_listener_sender_map};
+use dependencies_sync::log::{warn, info};
+use dependencies_sync::parking_lot::lock_api::RwLock;
+use dependencies_sync::parking_lot::RawRwLock;
 use std::sync::Arc;
 
 pub fn dispatch(type_id: &String, dispatch_queue_arc: Arc<RwLock<RawRwLock, DispatchQueue>>) {
@@ -55,8 +55,8 @@ pub fn dispatch(type_id: &String, dispatch_queue_arc: Arc<RwLock<RawRwLock, Disp
                     }
 
                     let type_id = type_id.clone();
-                    let listener_id = listener_id.clone();
-                    let listner_index = *listner_index;
+                    let _listener_id = listener_id.clone();
+                    let _listner_index = *listner_index;
 
                     let event_echo_wrapper = event_echo_wrapper.clone();
 
@@ -68,13 +68,11 @@ pub fn dispatch(type_id: &String, dispatch_queue_arc: Arc<RwLock<RawRwLock, Disp
                             let result = sender.clone().send(event_echo_wrapper.clone()).await;
                             if result.is_ok() {
                                 break;
+                            } else if retry_times > max_retry_times {
+                                warn!("{}: {}", t!("发送事件失败"), type_id);
+                                break;
                             } else {
-                                if retry_times > max_retry_times {
-                                    warn!("{}: {}", t!("发送事件失败"), type_id);
-                                    break;
-                                } else {
-                                    retry_times += 1;
-                                }
+                                retry_times += 1;
                             }
                         }
                     });

@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 use crate::event_type_listeners_map;
 use crate::event_type_listeners_map::IndexListenerMap;
 

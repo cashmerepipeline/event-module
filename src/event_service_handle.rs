@@ -6,16 +6,16 @@ Introduction:
 */
 
 use auth::jwt::validate_is_root;
-use bson::Document;
+use dependencies_sync::bson::Document;
 use cash_core::Manage;
 use event::event;
 use majordomo;
 use manage_define::manage_ids::EVENTS_MANAGE_ID;
 use managers::{Manager, traits::ManagerTrait};
 use std::sync::Arc;
-use tokio::sync::mpsc;
-// use tokio::io::AsyncReadExt;
-use tonic::{Request, Response, Status};
+use dependencies_sync::tokio::sync::mpsc;
+// use dependencies_sync::tokio::io::AsyncReadExt;
+use dependencies_sync::tonic::{Request, Response, Status};
 use view;
 use view::ViewLevel;
 

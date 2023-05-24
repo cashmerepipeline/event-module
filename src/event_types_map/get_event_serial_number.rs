@@ -1,8 +1,8 @@
-use parking_lot::RwLock;
+use dependencies_sync::parking_lot::RwLock;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use super::{get_event_type, get_event_types_map};
+use super::{get_event_type};
 
 pub type SerialNumber = u64;
 
@@ -37,13 +37,13 @@ pub async fn get_event_serial_number(type_id: &String) -> Option<SerialNumber> {
         Some(serial_number) => {
             let mut serial_number = serial_number.write();
             *serial_number += 1;
-            serial_number.clone()
+            *serial_number
         }
 
         None => {
             // 初始化为 1
             let new_serial_number = Arc::new(RwLock::new(1));
-            map.insert(type_id.to_string(), new_serial_number.clone());
+            map.insert(type_id.to_string(), new_serial_number);
             1u64
         }
     };

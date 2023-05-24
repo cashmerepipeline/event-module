@@ -1,8 +1,8 @@
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{BTreeMap};
 use std::sync::Arc;
 
-use parking_lot::RwLock;
 
-use crate::protocols::{Event, EventEmitter, EventListener, EventType};
+
+use crate::protocols::{EventType};
 
 pub type EventTypesMap = BTreeMap<String, Arc<EventType>>;
