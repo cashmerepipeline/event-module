@@ -67,14 +67,12 @@ pub trait HandleEmitEvent {
             return Err(Status::unauthenticated(t!("用户不具有可读权限")));
         }
 
-        let majordomo_arc = get_majordomo().await;
+        let majordomo_arc = get_majordomo();
         let emitter_manager = majordomo_arc
             .get_manager_by_id(EVENT_EMITTERS_MANAGE_ID)
-            .await
             .unwrap();
         let event_type_manager = majordomo_arc
             .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
-            .await
             .unwrap();
 
         // 存在检查

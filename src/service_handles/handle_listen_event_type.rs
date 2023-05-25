@@ -52,10 +52,9 @@ pub trait HandleListenEventType {
             return Err(Status::not_found(t!("事件类型不存在")));
         }
 
-        let majordomo_arc = get_majordomo().await;
+        let majordomo_arc = get_majordomo();
         let listener_manager = majordomo_arc
             .get_manager_by_id(EVENT_LISTENERS_MANAGE_ID)
-            .await
             .unwrap();
 
         // 存在检查

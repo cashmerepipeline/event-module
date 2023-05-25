@@ -48,11 +48,10 @@ impl CashmereServer {
 
         let mut event_manager_arc: Option<Arc<Manager>> = None;
         {
-            let major_arc = majordomo::get_majordomo().await;
+            let major_arc = majordomo::get_majordomo();
             let major_lock = major_arc;
             let manager_arc = major_lock
                 .get_manager_by_id(EVENTS_MANAGE_ID)
-                .await
                 .unwrap();
             event_manager_arc.replace(manager_arc);
         }

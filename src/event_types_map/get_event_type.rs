@@ -24,10 +24,9 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
 
     // 如果不存在，从数据库中获取
     let manager = {
-        let majar = majordomo::get_majordomo().await;
+        let majar = majordomo::get_majordomo();
         majar
             .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
-            .await
             .unwrap()
     };
 
