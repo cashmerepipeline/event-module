@@ -1,4 +1,4 @@
-library event_system_codes;
+library event_module;
 
 /// A Calculator.
 class Calculator {

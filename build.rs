@@ -26,6 +26,6 @@ fn main() {
     manage_define::utils::generate_manage_defines(
         &vec!["manage_defines"],
         "src",
-        Some("dart_packages/event_system_codes/lib"),
+        Some("dart_packages/event_module/lib"),
     );
 }

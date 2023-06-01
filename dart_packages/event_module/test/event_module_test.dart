@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:event_system_codes/event_system_codes.dart';
+import 'package:event_module/event_module.dart';
 
 void main() {
   test('adds one to input values', () {

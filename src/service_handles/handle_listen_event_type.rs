@@ -37,15 +37,6 @@ pub trait HandleListenEventType {
         let listener_id = &request.get_ref().listener_id;
         let type_id = &request.get_ref().type_id;
 
-        if !view::can_collection_read(
-            &account_id,
-            &role_group,
-            &EVENT_LISTENERS_MANAGE_ID.to_string(),
-        )
-        .await
-        {
-            return Err(Status::unauthenticated("用户不具有可写权限"));
-        }
 
         // 事件类型存在检查
         if get_event_type(type_id).await.is_none() {

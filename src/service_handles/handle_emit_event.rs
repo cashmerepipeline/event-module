@@ -57,16 +57,6 @@ pub trait HandleEmitEvent {
             )));
         }
 
-        if !view::can_collection_read(
-            &account_id,
-            &role_group,
-            &EVENT_EMITTERS_MANAGE_ID.to_string(),
-        )
-        .await
-        {
-            return Err(Status::unauthenticated(t!("用户不具有可读权限")));
-        }
-
         let majordomo_arc = get_majordomo();
         let emitter_manager = majordomo_arc
             .get_manager_by_id(EVENT_EMITTERS_MANAGE_ID)
