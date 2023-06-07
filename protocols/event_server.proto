@@ -100,6 +100,20 @@ message ListListenerResponse {
   repeated EventListener listeners = 1;
 }
 
+message ListenerInstance {
+  string listener_id = 1;
+  string instance_name = 2;
+  string instance_index = 3;
+}
+
+// 列出监听者的实例
+message ListListenerInstanceRequest {
+  string listener_id = 1;
+}
+message ListListenerInstanceResponse {
+  repeated ListenerInstance instances = 1;
+}
+
 // 取得发送者
 message GetEventEmitterRequest {
   string emitter_id = 1;

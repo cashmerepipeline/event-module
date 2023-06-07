@@ -1,7 +1,7 @@
 use crate::dispatch_queue::event_type_queue_map::DispatchQueue;
 use crate::event_services::get_event_runtime;
 use crate::event_type_listeners_map::get_event_type_listener_map;
-use crate::listener_senders_map::{get_listener_sender_map};
+use crate::listener_senders_map::{get_listener_sender_map, remove_listener_senders};
 use dependencies_sync::log::{warn, info};
 use dependencies_sync::parking_lot::lock_api::RwLock;
 use dependencies_sync::parking_lot::RawRwLock;
@@ -80,11 +80,7 @@ pub fn dispatch(type_id: &String, dispatch_queue_arc: Arc<RwLock<RawRwLock, Disp
             }
             {
                 // 移除已经失效的事件发送器
-                let mut listener_sender_map = listener_sender_map_arc.write();
-                for index in invalid_sender_indexes.iter() {
-                    info!("{}: {}", t!("移除已经失效的事件发送器"), index);
-                    listener_sender_map.remove(index);
-                }
+                remove_listener_senders(listener_id, invalid_sender_indexes);
             }
         }
     }

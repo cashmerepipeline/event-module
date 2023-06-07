@@ -5,12 +5,13 @@ use std::sync::Arc;
 use super::{get_event_type};
 
 pub type SerialNumber = u64;
+type EventTypeSerialNumberMap = BTreeMap<String, Arc<RwLock<SerialNumber>>>;
 
 static mut EVENT_SERIAL_NUMBER_MAP: Option<
-    Arc<RwLock<BTreeMap<String, Arc<RwLock<SerialNumber>>>>>,
+    Arc<RwLock<EventTypeSerialNumberMap>>,
 > = None;
 
-pub fn get_event_serial_number_map() -> Arc<RwLock<BTreeMap<String, Arc<RwLock<SerialNumber>>>>> {
+pub fn get_event_serial_number_map() -> Arc<RwLock<EventTypeSerialNumberMap>> {
     unsafe {
         if EVENT_SERIAL_NUMBER_MAP.is_none() {
             EVENT_SERIAL_NUMBER_MAP = Some(Arc::new(RwLock::new(BTreeMap::new())));

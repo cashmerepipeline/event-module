@@ -1,8 +1,7 @@
 use dependencies_sync::bson::{self};
+use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::log::debug;
 use dependencies_sync::tokio;
-use dependencies_sync::tokio_stream;
-use dependencies_sync::futures::TryFutureExt;
 
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 
@@ -13,8 +12,9 @@ use manage_define::general_field_ids::*;
 use managers::traits::ManagerTrait;
 
 use request_utils::request_account_context;
+use view;
 
-use service_utils::types::{ResponseStream, StreamResponseResult};
+use service_utils::types::UnaryResponseResult;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_serial_number;
@@ -22,44 +22,57 @@ use crate::field_ids::*;
 use crate::manage_ids::*;
 use crate::protocols::*;
 
-use super::dispatch_event::dispatch_event;
+use super::dispatch_to_listener_instance::dispatch_to_listener_instance;
 
 #[async_trait]
-pub trait HandleEmitEvent {
-    async fn handle_emit_event(
+pub trait HandleEmitEventToInstance {
+    async fn handle_emit_event_to_instance(
         &self,
-        request: Request<EmitEventRequest>,
-    ) -> StreamResponseResult<EmitEventResponse> {
+        request: Request<EmitEventToInstanceRequest>,
+    ) -> UnaryResponseResult<EmitEventResponse> {
         validate_view_rules(request)
             .and_then(validate_request_params)
-            .and_then(handle_emit_event)
+            .and_then(handle_emit_event_to_instance)
             .await
     }
 }
 
 async fn validate_view_rules(
-    request: Request<EmitEventRequest>,
-) -> Result<Request<EmitEventRequest>, Status> {
+    request: Request<EmitEventToInstanceRequest>,
+) -> Result<Request<EmitEventToInstanceRequest>, Status> {
+    #[cfg(feature = "view_rules_validate")]
+    {
+        let manage_id = EVENT_EMITTERS_MANAGE_ID;
+        let (_account_id, _groups, role_group) = request_account_context(request.metadata());
+        view::validates::validate_collection_can_read(&manage_id, &role_group).await?;
+    }
+
     Ok(request)
 }
 
 async fn validate_request_params(
-    request: Request<EmitEventRequest>,
-) -> Result<Request<EmitEventRequest>, Status> {
-    Ok(request)
-}
-
-async fn handle_emit_event(
-    request: Request<EmitEventRequest>,
-) -> StreamResponseResult<EmitEventResponse> {
-    let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
-
+    request: Request<EmitEventToInstanceRequest>,
+) -> Result<Request<EmitEventToInstanceRequest>, Status> {
     let event = &request.get_ref().event;
+    let _listener_id = &request.get_ref().listener_id;
+    let _instance_index = &request.get_ref().instance_index;
 
     // 有效性检查
     if event.is_none() {
         return Err(Status::invalid_argument(t!("事件不能为空")));
     }
+
+    Ok(request)
+}
+
+async fn handle_emit_event_to_instance(
+    request: Request<EmitEventToInstanceRequest>,
+) -> UnaryResponseResult<EmitEventResponse> {
+    let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
+
+    let event = &request.get_ref().event;
+    let listener_id = &request.get_ref().listener_id;
+    let instance_index = &request.get_ref().instance_index;
 
     let mut event = event.as_ref().unwrap().to_owned();
     if let Some(serial_number) = get_event_serial_number(&event.type_id).await {
@@ -125,10 +138,8 @@ async fn handle_emit_event(
     }
 
     // 创建返回流
-    let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(16);
-
     if event.need_echo {
-        // 创建回馈事件管道
+        // 创建回馈事件管道，不使用oneshot，需要匹配管道类型
         let (echo_tx, mut echo_rx) = tokio::sync::mpsc::channel::<Event>(16);
 
         let event_wrapper = EventInnerWrapper {
@@ -136,39 +147,57 @@ async fn handle_emit_event(
             echo_sender: Some(echo_tx),
         };
 
-        if let Err(e) = dispatch_event(event_wrapper).await {
-            return Err(Status::aborted(format!("{}: {}", t!("发送事件失败 "), e)));
+        // 转发事件
+        if let Err(e) =
+            dispatch_to_listener_instance(event_wrapper, listener_id, *instance_index).await
+        {
+            return Err(Status::aborted(format!(
+                "{}: {}",
+                t!("发送事件失败 "),
+                e.details()
+            )));
         };
 
-        // 转发事件
-        tokio::spawn(async move {
-            while let Some(event) = echo_rx.recv().await {
+        // 等待反馈
+        let result = tokio::time::timeout(std::time::Duration::from_secs(10), async {
+            if let Some(event) = echo_rx.recv().await {
                 debug!("{}, {}", t!("接收到事件反馈"), event.serial_number);
+
                 let resp = EmitEventResponse { event: Some(event) };
-                if let Err(e) = resp_tx.send(Ok(resp)).await {
-                    debug!("{}: {}", t!("发送事件反馈失败"), e);
-                    // 反馈失败，尝试下一个反馈
-                    continue;
-                };
+                return Ok(Response::new(resp));
             }
-        });
+
+            Err(Status::aborted(t!("等待事件反馈超时")))
+        })
+        .await;
+
+        match result {
+            Ok(r) => r,
+            Err(e) => Err(Status::aborted(format!(
+                "{}: {}",
+                t!("等待事件反馈失败"),
+                e
+            ))),
+        }
     } else {
         let event_wrapper = EventInnerWrapper {
             event: event.clone(),
             echo_sender: None,
         };
 
-        if let Err(e) = dispatch_event(event_wrapper).await {
-            return Err(Status::aborted(format!("{}: {}", t!("发送事件失败 "), e)));
+        if let Err(e) =
+            dispatch_to_listener_instance(event_wrapper, listener_id, *instance_index).await
+        {
+            return Err(Status::aborted(format!(
+                "{}: {}",
+                t!("发送事件失败 "),
+                e.details()
+            )));
         };
 
         // 反馈事件已经发送
         let resp = EmitEventResponse { event: None };
-        let _ = resp_tx.send(Ok(resp)).await;
-    }
 
-    let resp_stream = tokio_stream::wrappers::ReceiverStream::new(resp_rx);
-    Ok(Response::new(
-        Box::pin(resp_stream) as ResponseStream<EmitEventResponse>
-    ))
+        Ok(Response::new(resp))
+    }
 }

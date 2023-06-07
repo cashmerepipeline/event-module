@@ -31,8 +31,8 @@ pub fn get_event_type_dispatch_queue(event_type_id: &String) -> Arc<RwLock<Dispa
         let event_type_dispatch_queue_map = get_event_type_dispatch_queue_map();
         let event_type_dispatch_queue_map = event_type_dispatch_queue_map.read();
         let event_type_dispatch_queue = event_type_dispatch_queue_map.get(event_type_id);
-        if event_type_dispatch_queue.is_some() {
-            return event_type_dispatch_queue.unwrap().clone();
+        if let Some(q) = event_type_dispatch_queue {
+            return q.clone();
         }
     }
     {
@@ -40,8 +40,8 @@ pub fn get_event_type_dispatch_queue(event_type_id: &String) -> Arc<RwLock<Dispa
         let event_type_dispatch_queue_map = get_event_type_dispatch_queue_map();
         let mut event_type_dispatch_queue_map = event_type_dispatch_queue_map.write();
         let event_type_dispatch_queue = event_type_dispatch_queue_map.get(event_type_id);
-        if event_type_dispatch_queue.is_some() {
-            event_type_dispatch_queue.unwrap().clone()
+        if let Some(q) = event_type_dispatch_queue {
+            q.clone()
         } else {
             let event_type_dispatch_queue = build_event_type_dispatch_queue();
             event_type_dispatch_queue_map

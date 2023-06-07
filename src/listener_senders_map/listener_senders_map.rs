@@ -1,4 +1,4 @@
-use std::{sync::Arc, collections::BTreeMap};
+use std::{collections::BTreeMap, sync::Arc};
 
 use dependencies_sync::parking_lot::RwLock;
 use dependencies_sync::tokio::sync::mpsc::Sender;
@@ -30,22 +30,21 @@ pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceInde
     {
         let listener_senders_map = get_listener_senders_map();
         let listener_senders_map = listener_senders_map.read();
-        let listener_sender_map = listener_senders_map.get(listender_id);
-        if listener_sender_map.is_some() {
-            return listener_sender_map.unwrap().clone();
+
+        if let Some(m) = listener_senders_map.get(listender_id) {
+            return m.clone();
         }
     }
     {
         // 不存在则创建
         let listener_senders_map = get_listener_senders_map();
         let mut listener_senders_map = listener_senders_map.write();
-        let listener_sender_map = listener_senders_map.get(listender_id);
-        if listener_sender_map.is_some() {
-            listener_sender_map.unwrap().clone()
+
+        if let Some(m) = listener_senders_map.get(listender_id) {
+            m.clone()
         } else {
             let listener_sender_map = build_listener_sender_map();
-            listener_senders_map
-                .insert(listender_id.to_string(), listener_sender_map.clone());
+            listener_senders_map.insert(listender_id.to_string(), listener_sender_map.clone());
             listener_sender_map
         }
     }

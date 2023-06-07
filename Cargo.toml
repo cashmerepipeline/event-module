@@ -33,3 +33,6 @@ service_utils = { path = "../cashmere_core/service_utils" }
 [build-dependencies]
 tonic-build = "0.7.2"
 manage_define = { path = "../cashmere_core/manage_define" }
+
+[features]
+view_rules_validate = ["view/view_rules_validate"]

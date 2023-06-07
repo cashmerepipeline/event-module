@@ -10,7 +10,7 @@ pub fn add_event_type_listener(event_type: String, listener_id: String) {
     if listener_map
         .values()
         // 查找是否已经存在该监听者
-        .any(|x| x.deref().deref() == &listener_id)
+        .any(|x| x.deref().deref() == listener_id)
     {
     } else {
         let index = listener_map.len() as u32;

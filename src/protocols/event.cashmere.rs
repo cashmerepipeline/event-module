@@ -29,6 +29,7 @@ pub struct Event {
     #[prost(bool, tag="7")]
     pub need_echo: bool,
 }
+/// 发送者，可以有多个实例，也就是一个事件类型可以有多个来源
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EventEmitter {
@@ -41,6 +42,8 @@ pub struct EventEmitter {
     #[prost(string, tag="4")]
     pub description: ::prost::alloc::string::String,
 }
+/// 监听者，一般只有一个实例
+/// 一个事件类型可以有多个监听者，用于对同一事件类型的不同处理
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EventListener {
@@ -61,22 +64,23 @@ pub struct EmitEventRequest {
     #[prost(message, optional, tag="1")]
     pub event: ::core::option::Option<Event>,
 }
-/// 返回反馈事件流
+/// 返回反馈事件流，只是事件发送成功与否的反馈，不是事件处理的反馈
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EmitEventResponse {
     #[prost(message, optional, tag="1")]
     pub event: ::core::option::Option<Event>,
 }
-/// 发送事件，并监听反馈
+/// 发送到指定的监听者实例，指定的监听者实例必须在线，
+/// 同一事件类型的特定事件处理
+/// 返回不是流
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EmitEventAndListenEchoRequest {
+pub struct EmitEventToInstanceRequest {
     #[prost(message, optional, tag="1")]
     pub event: ::core::option::Option<Event>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EmitEventAndListenEchoResponse {
-    #[prost(message, optional, tag="1")]
-    pub event: ::core::option::Option<Event>,
+    #[prost(string, tag="2")]
+    pub listener_id: ::prost::alloc::string::String,
+    #[prost(uint32, tag="3")]
+    pub instance_index: u32,
 }
 /// 监听事件类型, 持续监听
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -220,6 +224,26 @@ pub struct ListListenerRequest {
 pub struct ListListenerResponse {
     #[prost(message, repeated, tag="1")]
     pub listeners: ::prost::alloc::vec::Vec<EventListener>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListenerInstance {
+    #[prost(string, tag="1")]
+    pub listener_id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub instance_name: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub instance_index: ::prost::alloc::string::String,
+}
+/// 列出监听者的实例
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListListenerInstanceRequest {
+    #[prost(string, tag="1")]
+    pub listener_id: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListListenerInstanceResponse {
+    #[prost(message, repeated, tag="1")]
+    pub instances: ::prost::alloc::vec::Vec<ListenerInstance>,
 }
 /// 取得发送者
 #[derive(Clone, PartialEq, ::prost::Message)]

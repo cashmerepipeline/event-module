@@ -7,7 +7,7 @@ use manage_define::manage_ids::*;
 use managers::traits::ManagerTrait;
 use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
-use view;
+
 
 use service_utils::validate_name;
 use service_utils::types::UnaryResponseResult;

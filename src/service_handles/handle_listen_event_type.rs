@@ -1,10 +1,10 @@
 use dependencies_sync::chrono::Utc;
 use dependencies_sync::log::debug;
 
-use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 use dependencies_sync::bson;
 use dependencies_sync::tokio;
 use dependencies_sync::tokio_stream;
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
 
@@ -13,11 +13,9 @@ use manage_define::general_field_ids::*;
 use managers::traits::ManagerTrait;
 
 use request_utils::request_account_context;
-use view;
 
 
 use service_utils::types::{ResponseStream, StreamResponseResult};
-
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_type;
@@ -32,11 +30,10 @@ pub trait HandleListenEventType {
         &self,
         request: Request<ListenEventTypeRequest>,
     ) -> StreamResponseResult<ListenEventTypeResponse> {
-        let (account_id, _groups, role_group) = request_account_context(request.metadata());
+        let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
 
         let listener_id = &request.get_ref().listener_id;
         let type_id = &request.get_ref().type_id;
-
 
         // 事件类型存在检查
         if get_event_type(type_id).await.is_none() {
@@ -86,7 +83,13 @@ pub trait HandleListenEventType {
         // 取得转发器
         let dispatcher_arc = match get_dispatcher(type_id) {
             Some(r) => r,
-            None => return Err(Status::aborted(format!("{}", t!("获取转发器失败 ")))),
+            None => {
+                return Err(Status::aborted(format!(
+                    "{}: {}",
+                    t!("获取转发器失败 "),
+                    type_id
+                )))
+            }
         };
 
         // 创建监听事件管道
