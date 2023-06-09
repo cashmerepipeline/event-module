@@ -17,7 +17,6 @@ dependencies_sync = { path = "../cashmere_core/dependencies_sync", features = ["
 
 cash_core = { path = "../cashmere_core/cash_core" }
 cash_result = { path = "../cashmere_core/cash_result" }
-data_server = { path = "../cashmere_core/data_server" }
 configs = { path = "../cashmere_core/configs" }
 majordomo = { path = "../cashmere_core/majordomo" }
 

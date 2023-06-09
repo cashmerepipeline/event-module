@@ -4,11 +4,12 @@ use crate::{event_inner_wrapper::EventInnerWrapper, type_dispatcher_map::get_dis
 
 // 发送事件
 pub async fn dispatch_event(event_wrapper: EventInnerWrapper) -> Result<(), String> {
-    let event = event_wrapper.event.clone();
+    let type_id  = event_wrapper.event.type_id.clone();
+    let serial_number = event_wrapper.event.serial_number;
 
-    let dispatcher_arc = match get_dispatcher(&event.type_id) {
+    let dispatcher_arc = match get_dispatcher(&type_id) {
         Some(r) => r,
-        None => return Err(format!("{}: {}", t!("获取转发器失败 "), event.type_id)),
+        None => return Err(format!("{}: {}", t!("获取转发器失败 "), type_id)),
     };
 
     let dispatch_sender = {
@@ -17,11 +18,11 @@ pub async fn dispatch_event(event_wrapper: EventInnerWrapper) -> Result<(), Stri
     };
 
     // 发送
-    debug!("{}, {}", t!("开始发送事件"), event.serial_number);
+    debug!("{}, {}", t!("开始发送事件"), serial_number);
     if let Err(e) = dispatch_sender.send(event_wrapper).await {
         return Err(format!("{}: {}", t!("发送事件失败 "), e));
     };
-    debug!("{}, {}", t!("完成发送事件"), event.serial_number);
+    debug!("{}, {}", t!("完成发送事件"), serial_number);
 
     Ok(())
 }

@@ -10,6 +10,7 @@ mod event_services;
 mod event_type_listeners_map;
 mod listener_senders_map;
 mod dispatch_queue;
+mod dispatch_channels;
 mod event_service_configs;
 
 pub mod service_handles;
@@ -24,3 +25,4 @@ mod type_dispatcher_map;
 pub use event_service_configs::*;
 pub use initialize_event_service::*;
 mod initialize_event_service;
+mod dispatch_event;

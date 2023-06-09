@@ -1,8 +1,8 @@
 use dependencies_sync::bson::{self};
+use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::log::debug;
 use dependencies_sync::tokio;
 use dependencies_sync::tokio_stream;
-use dependencies_sync::futures::TryFutureExt;
 
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 
@@ -32,7 +32,7 @@ pub trait HandleEmitEvent {
     ) -> StreamResponseResult<EmitEventResponse> {
         validate_view_rules(request)
             .and_then(validate_request_params)
-            .and_then(handle_emit_event)
+            .and_then( handle_emit_event)
             .await
     }
 }
@@ -40,18 +40,22 @@ pub trait HandleEmitEvent {
 async fn validate_view_rules(
     request: Request<EmitEventRequest>,
 ) -> Result<Request<EmitEventRequest>, Status> {
+    debug!("{}: {}", t!("验证视图规则"), EVENT_TYPES_MANAGE_ID);
     Ok(request)
 }
 
 async fn validate_request_params(
     request: Request<EmitEventRequest>,
 ) -> Result<Request<EmitEventRequest>, Status> {
+    debug!("{}: {}", t!("验证参数"), EVENT_TYPES_MANAGE_ID);
     Ok(request)
 }
 
 async fn handle_emit_event(
     request: Request<EmitEventRequest>,
 ) -> StreamResponseResult<EmitEventResponse> {
+    debug!("{}: {}", t!("处理请求"), EVENT_TYPES_MANAGE_ID);
+
     let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
 
     let event = &request.get_ref().event;
@@ -171,4 +175,8 @@ async fn handle_emit_event(
     Ok(Response::new(
         Box::pin(resp_stream) as ResponseStream<EmitEventResponse>
     ))
+    // validate_view_rules(request)
+    //     .and_then(validate_request_params)
+    //     .and_then(handle_emit_event)
+    //     .await
 }

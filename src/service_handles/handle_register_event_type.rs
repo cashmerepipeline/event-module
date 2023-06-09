@@ -51,7 +51,7 @@ pub trait HandleRegisterEventType {
             return Err(Status::aborted(format!(
                 "{}: 管理 {}",
                 t!("新建实体文档失败"),
-                SPECSES_MANAGE_ID
+                EVENT_TYPES_MANAGE_ID
             )));
         };
 

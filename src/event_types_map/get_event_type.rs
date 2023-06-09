@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use dependencies_sync::bson;
+use std::sync::Arc;
 
 use manage_define::cashmere::Name;
 use manage_define::general_field_ids::{DESCRIPTIONS_FIELD_ID, NAME_MAP_FIELD_ID};
@@ -18,16 +18,13 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
 
         if let Some(event_type) = event_types_map.get(type_id.as_str()) {
             return Some(event_type.clone());
-        } else {
         }
     }
 
     // 如果不存在，从数据库中获取
     let manager = {
         let majar = majordomo::get_majordomo();
-        majar
-            .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
-            .unwrap()
+        majar.get_manager_by_id(EVENT_TYPES_MANAGE_ID).unwrap()
     };
 
     if let Ok(type_doc) = manager.get_entity_by_id(type_id).await {
@@ -38,9 +35,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
                 .to_owned(),
         )
         .unwrap();
-        let _has_echo = type_doc
-            .get_bool(EVENT_TYPES_HAS_ECHO_FIELD_ID.to_string())
-            .unwrap();
+
         let description = type_doc
             .get_str(DESCRIPTIONS_FIELD_ID.to_string())
             .unwrap()
