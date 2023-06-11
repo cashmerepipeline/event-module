@@ -1,4 +1,4 @@
-use dependencies_sync::{tokio, log::{self, info, debug}};
+use dependencies_sync::{tokio, log::{self, info}};
 
 use crate::{event_services::get_event_runtime, dispatch_event::dispatch_event};
 
@@ -16,7 +16,7 @@ pub fn create_dispatch_channel(
     
     {
         let event_type_dispatch_sender_map_arc = get_event_type_dispatch_sender_map();
-        let mut event_type_dispatch_sender_map = event_type_dispatch_sender_map_arc.read();
+        let event_type_dispatch_sender_map = event_type_dispatch_sender_map_arc.read();
         if event_type_dispatch_sender_map.contains_key(event_type_id) {
             log::warn!("{}: {}", t!("事件类型已存在"), event_type_id);
             return;

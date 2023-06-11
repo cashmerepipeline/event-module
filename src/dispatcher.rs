@@ -3,7 +3,7 @@ use dependencies_sync::log::info;
 use dependencies_sync::tokio::sync::mpsc::{channel, Sender};
 
 use crate::dispatch_channels::dispatch_to_channel;
-use crate::dispatch_queue::add_event_echo_wrapper_to_queue;
+
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_services::get_event_runtime;

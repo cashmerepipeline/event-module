@@ -1,11 +1,10 @@
 use cash_result::{operation_failed, OperationResult};
 use configs::get_server_configs;
-use dependencies_sync::{log::error, bson};
+use dependencies_sync::{bson};
 use majordomo::get_majordomo;
 use manage_define::{
     cashmere::Name,
     general_field_ids::{DESCRIPTIONS_FIELD_ID, ID_FIELD_ID, NAME_MAP_FIELD_ID},
-    language_keys::{CHINESE, ENGLISH},
 };
 use managers::ManagerTrait;
 
@@ -35,7 +34,7 @@ pub async fn init_event_types_map() -> Result<(), OperationResult> {
     };
 
     for type_doc in event_types_docs {
-        let lang_code = &get_server_configs().language_code;
+        let _lang_code = &get_server_configs().language_code;
 
         let id = type_doc.get_str(ID_FIELD_ID.to_string()).unwrap();
         let description = type_doc.get_str(DESCRIPTIONS_FIELD_ID.to_string()).unwrap();

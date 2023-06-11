@@ -6,7 +6,7 @@ use manage_define::general_field_ids::{DESCRIPTIONS_FIELD_ID, NAME_MAP_FIELD_ID}
 use managers::ManagerTrait;
 
 use crate::event_types_map::get_event_types_map;
-use crate::field_ids::EVENT_TYPES_HAS_ECHO_FIELD_ID;
+
 use crate::manage_ids::EVENT_TYPES_MANAGE_ID;
 use crate::protocols::EventType;
 
