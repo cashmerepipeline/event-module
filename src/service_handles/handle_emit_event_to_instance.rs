@@ -18,8 +18,8 @@ use service_utils::types::UnaryResponseResult;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_serial_number;
-use crate::field_ids::*;
-use crate::manage_ids::*;
+use crate::ids_codes::field_ids::*;
+use crate::ids_codes::manage_ids::*;
 use crate::protocols::*;
 
 use super::dispatch_to_listener_instance::dispatch_to_listener_instance;

@@ -78,9 +78,9 @@ message DeregisterEventListenerResponse {
 }
 
 // 列出所有事件类型
-message ListEventTypeRequest {
+message ListEventTypesRequest {
 }
-message ListEventTypeResponse {
+message ListEventTypesResponse {
   repeated EventType event_types = 1;
 }
 
@@ -101,31 +101,14 @@ message ListListenerResponse {
 }
 
 message ListenerInstance {
-  string listener_id = 1;
-  string instance_name = 2;
-  string instance_index = 3;
+  string name = 2;
+  uint32 index = 3;
 }
 
 // 列出监听者的实例
-message ListListenerInstanceRequest {
+message ListListenerInstancesRequest {
   string listener_id = 1;
 }
-message ListListenerInstanceResponse {
+message ListListenerInstancesResponse {
   repeated ListenerInstance instances = 1;
-}
-
-// 取得发送者
-message GetEventEmitterRequest {
-  string emitter_id = 1;
-}
-message GetEventEmitterResponse {
-  EventEmitter emitter = 1;
-}
-
-// 取得监听者
-message GetEventListenerRequest {
-  string listener_id = 1;
-}
-message GetEventListenerResponse {
-  EventListener listener = 1;
 }

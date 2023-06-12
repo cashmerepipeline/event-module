@@ -1,7 +1,7 @@
 use cash_result::{OperationResult, operation_failed};
 use dependencies_sync::log::{info, error};
 
-use crate::{event_inner_wrapper::EventInnerWrapper, listener_senders_map::get_listener_instance_sender};
+use crate::{event_inner_wrapper::EventInnerWrapper, listener_instances_map::get_listener_instance_sender};
 
 /// 不经过队列直接分发事件
 pub async fn dispatch_to_listener_instance(

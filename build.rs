@@ -1,3 +1,5 @@
+use dependencies_sync::tonic_build;
+
 fn main() {
     tonic_build::configure()
         .out_dir("src/protocols")
@@ -25,7 +27,7 @@ fn main() {
 
     manage_define::utils::generate_manage_defines(
         &vec!["manage_defines"],
-        "src",
+        "src/ids_codes",
         Some("dart_packages/event_module/lib"),
     );
 }

@@ -62,6 +62,7 @@ message  EmitEventToInstanceRequest {
 message  ListenEventTypeRequest {
   string listener_id =2;
   string type_id = 1;
+  string instance_name = 3;
 }
 message  ListenEventTypeResponse {
   Event event = 1;

@@ -7,7 +7,7 @@ use managers::ManagerTrait;
 
 use crate::event_types_map::get_event_types_map;
 
-use crate::manage_ids::EVENT_TYPES_MANAGE_ID;
+use crate::ids_codes::manage_ids::EVENT_TYPES_MANAGE_ID;
 use crate::protocols::EventType;
 
 pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {

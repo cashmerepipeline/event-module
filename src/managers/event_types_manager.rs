@@ -22,7 +22,7 @@ use cash_result::*;
 use manage_define::manage_ids::MANAGES_MANAGE_ID;
 use managers::declare_get_manager;
 
-use crate::manage_ids::EVENT_TYPES_MANAGE_ID;
+use crate::ids_codes::manage_ids::EVENT_TYPES_MANAGE_ID;
 
 #[derive(Default)]
 pub struct EventTypesManager;
@@ -53,7 +53,7 @@ impl ManagerTrait for EventTypesManager {
     }
 
     fn has_cache(&self) -> bool {
-        false
+        true
     }
 
     async fn get_manage(&self) -> Arc<RwLock<Manage>> {

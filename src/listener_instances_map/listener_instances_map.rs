@@ -1,16 +1,17 @@
 use std::{collections::BTreeMap, sync::Arc};
 
 use dependencies_sync::parking_lot::RwLock;
-use dependencies_sync::tokio::sync::mpsc::Sender;
 
-use crate::event_inner_wrapper::EventInnerWrapper;
 
-pub type InstanceIndexSenderMap = BTreeMap<u32, Option<Sender<EventInnerWrapper>>>;
-type ListenerSendersMap = BTreeMap<String, Arc<RwLock<InstanceIndexSenderMap>>>;
+
+use crate::listener_instance::ListenerInstance;
+
+pub type IndexInstanceMap = BTreeMap<u32, Option<ListenerInstance>>;
+type ListenerSendersMap = BTreeMap<String, Arc<RwLock<IndexInstanceMap>>>;
 
 static mut LISTENER_SENDERS_MAP: Option<Arc<RwLock<ListenerSendersMap>>> = None;
 
-pub fn get_listener_senders_map() -> Arc<RwLock<ListenerSendersMap>> {
+pub fn get_listener_instances_map() -> Arc<RwLock<ListenerSendersMap>> {
     unsafe {
         if LISTENER_SENDERS_MAP.is_some() {
             LISTENER_SENDERS_MAP.clone().unwrap()
@@ -26,9 +27,9 @@ fn build_listener_senders_map() -> Arc<RwLock<ListenerSendersMap>> {
     Arc::new(RwLock::new(listener_senders_map))
 }
 
-pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceIndexSenderMap>> {
+pub fn get_listener_instance_map(listender_id: &String) -> Arc<RwLock<IndexInstanceMap>> {
     {
-        let listener_senders_map = get_listener_senders_map();
+        let listener_senders_map = get_listener_instances_map();
         let listener_senders_map = listener_senders_map.read();
 
         if let Some(m) = listener_senders_map.get(listender_id) {
@@ -37,7 +38,7 @@ pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceInde
     }
     {
         // 不存在则创建
-        let listener_senders_map = get_listener_senders_map();
+        let listener_senders_map = get_listener_instances_map();
         let mut listener_senders_map = listener_senders_map.write();
 
         if let Some(m) = listener_senders_map.get(listender_id) {
@@ -50,7 +51,7 @@ pub fn get_listener_sender_map(listender_id: &String) -> Arc<RwLock<InstanceInde
     }
 }
 
-fn build_listener_sender_map() -> Arc<RwLock<InstanceIndexSenderMap>> {
-    let listener_sender_map = InstanceIndexSenderMap::new();
+fn build_listener_sender_map() -> Arc<RwLock<IndexInstanceMap>> {
+    let listener_sender_map = IndexInstanceMap::new();
     Arc::new(RwLock::new(listener_sender_map))
 }

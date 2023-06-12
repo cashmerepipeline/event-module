@@ -1,6 +1,6 @@
 [package]
 name = "event_module"
-version = "0.3.0"
+version = "0.4.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -30,7 +30,7 @@ request_utils = { path = "../cashmere_core/request_utils" }
 service_utils = { path = "../cashmere_core/service_utils" }
 
 [build-dependencies]
-tonic-build = "0.7.2"
+dependencies_sync = { path = "../cashmere_core/dependencies_sync", features = ["tonic-build"]}
 manage_define = { path = "../cashmere_core/manage_define" }
 
 [features]

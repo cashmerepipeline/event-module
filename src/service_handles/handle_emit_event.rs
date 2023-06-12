@@ -18,8 +18,8 @@ use service_utils::types::{ResponseStream, StreamResponseResult};
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_serial_number;
-use crate::field_ids::*;
-use crate::manage_ids::*;
+use crate::ids_codes::field_ids::*;
+use crate::ids_codes::manage_ids::*;
 use crate::protocols::*;
 
 use super::dispatch_event::dispatch_event;

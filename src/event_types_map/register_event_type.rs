@@ -4,7 +4,6 @@ use std::sync::Arc;
 use dependencies_sync::log::warn;
 
 
-use crate::dispatch_channels::create_dispatch_channel;
 use crate::event_types_map::get_event_types_map;
 
 
@@ -35,6 +34,8 @@ pub fn register_event_type(new_event_type: EventType) -> Option<String> {
     
     #[cfg(feature = "use_channel_dispatch")]
     {
+        use crate::dispatch_channels::create_dispatch_channel;
+
         let buffer_size = get_event_service_configs().max_event_type_queue_size as usize;
         create_dispatch_channel(&type_id, buffer_size);
     }

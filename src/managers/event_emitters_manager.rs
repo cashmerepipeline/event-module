@@ -22,7 +22,7 @@ use cash_result::*;
 use manage_define::manage_ids::MANAGES_MANAGE_ID;
 use managers::declare_get_manager;
 
-use crate::manage_ids::EVENT_EMITTERS_MANAGE_ID;
+use crate::ids_codes::manage_ids::EVENT_EMITTERS_MANAGE_ID;
 
 #[derive(Default)]
 pub struct EventEmittersManager;

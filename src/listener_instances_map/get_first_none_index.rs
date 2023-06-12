@@ -1,8 +1,8 @@
-use crate::listener_senders_map::get_listener_sender_map;
+use super::get_listener_instance_map;
 
 pub fn get_first_none_index(listener_id:&String) -> u32{
-    let instance_index_sender_map = get_listener_sender_map(listener_id);
-    let instance_index_sender_map = instance_index_sender_map.read();
+    let instance_index_sender_map_arc = get_listener_instance_map(listener_id);
+    let instance_index_sender_map = instance_index_sender_map_arc.read();
 
     let mut index = 0;
     loop{

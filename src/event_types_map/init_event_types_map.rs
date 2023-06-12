@@ -8,7 +8,8 @@ use manage_define::{
 };
 use managers::ManagerTrait;
 
-use crate::{manage_ids::EVENT_TYPES_MANAGE_ID, protocols::EventType};
+use crate::ids_codes::{manage_ids::EVENT_TYPES_MANAGE_ID};
+use crate::protocols::EventType;
 
 use super::register_event_type;
 

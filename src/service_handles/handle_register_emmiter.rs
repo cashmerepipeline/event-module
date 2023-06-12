@@ -12,8 +12,8 @@ use service_utils::validate_name;
 use service_utils::types::UnaryResponseResult;
 
 use crate::protocols::*;
-use crate::field_ids::*;
-use crate::manage_ids::*;
+use crate::ids_codes::field_ids::*;
+use crate::ids_codes::manage_ids::*;
 
 #[async_trait]
 pub trait HandleRegisterEventEmitter {

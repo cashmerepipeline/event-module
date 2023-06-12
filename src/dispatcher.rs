@@ -2,13 +2,10 @@ use dependencies_sync::log::info;
 
 use dependencies_sync::tokio::sync::mpsc::{channel, Sender};
 
-use crate::dispatch_channels::dispatch_to_channel;
-
-
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_services::get_event_runtime;
 use crate::event_type_listeners_map::add_event_type_listener;
-use crate::listener_senders_map::add_listener_sender;
+use crate::listener_instances_map::add_listener_sender;
 // use crate::type_listeners_map::{
 //     add_listener_sender, get_type_listener_senders_map, get_type_listeners_map,
 //     get_type_listeners_senders_map, remove_listener_sender,
@@ -39,10 +36,16 @@ impl EventDispatcher {
         rt.spawn(async move {
             while let Some(event_wrapper) = dispatch_reciever.recv().await {
                 #[cfg(feature = "use_queue_dispatch")]
-                add_event_echo_wrapper_to_queue(event_wrapper);
+                {
+                    use crate::dispatch_queue::add_event_echo_wrapper_to_queue;
+                    add_event_echo_wrapper_to_queue(event_wrapper);
+                }
 
                 #[cfg(feature = "use_channel_dispatch")]
-                dispatch_to_channel(event_wrapper).await;
+                {
+                    use crate::dispatch_channels::dispatch_to_channel;
+                    dispatch_to_channel(event_wrapper).await;
+                }
             }
 
             info!("EventDispatcher: {} is closed", type_id);
@@ -54,11 +57,12 @@ impl EventDispatcher {
     pub fn add_listener_sender(
         &self,
         listener_id: &String,
+        instance_name: String,
         listener_sender: Sender<EventInnerWrapper>,
     ) {
         let type_id = self.type_id.clone();
         info!("{}: {}", t!("添加事件监听器"), listener_id);
         add_event_type_listener(type_id, listener_id.clone());
-        add_listener_sender(listener_id, listener_sender);
+        add_listener_sender(listener_id, instance_name, listener_sender);
     }
 }

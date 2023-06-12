@@ -19,8 +19,8 @@ use service_utils::types::{ResponseStream, StreamResponseResult};
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_types_map::get_event_type;
-use crate::field_ids::*;
-use crate::manage_ids::*;
+use crate::ids_codes::field_ids::*;
+use crate::ids_codes::manage_ids::*;
 use crate::protocols::*;
 use crate::type_dispatcher_map::get_dispatcher;
 
@@ -58,6 +58,7 @@ async fn handle_listen_event_type(
 
     let listener_id = &request.get_ref().listener_id;
     let type_id = &request.get_ref().type_id;
+    let instance_name = &request.get_ref().instance_name;
 
     // 事件类型存在检查
     if get_event_type(type_id).await.is_none() {
@@ -118,7 +119,7 @@ async fn handle_listen_event_type(
 
     // 创建监听事件管道
     let (event_tx, mut event_rx) = tokio::sync::mpsc::channel::<EventInnerWrapper>(4);
-    dispatcher_arc.add_listener_sender(listener_id, event_tx);
+    dispatcher_arc.add_listener_sender(listener_id, instance_name.to_owned(), event_tx);
 
     // 创建返回流
     let (resp_tx, resp_rx) = tokio::sync::mpsc::channel(4);
