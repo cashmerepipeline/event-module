@@ -3,7 +3,6 @@ use dependencies_sync::tonic::async_trait;
 use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::tonic::{Request, Response, Status};
 
-use crate::ids_codes::manage_ids::EVENT_LISTENERS_MANAGE_ID;
 use crate::listener_instances_map::get_listener_instance_map;
 use crate::protocols::*;
 
@@ -25,6 +24,7 @@ async fn validate_view_rules(
 ) -> Result<Request<ListListenerInstancesRequest>, Status> {
     #[cfg(feature = "validate_view_rules")]
     {
+        use crate::ids_codes::manage_ids::EVENT_LISTENERS_MANAGE_ID;
         let manage_id = EVENT_LISTENERS_MANAGE_ID;
         let (account_id, _groups, role_group) = request_account_context(request.metadata());
         if let Err(e) = view::validates::validate_collection_can_read(&manage_id, &role_group).await
