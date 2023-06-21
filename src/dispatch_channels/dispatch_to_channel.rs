@@ -1,4 +1,5 @@
 use dependencies_sync::log::{error, debug};
+use dependencies_sync::rust_i18n::{self, t};
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 

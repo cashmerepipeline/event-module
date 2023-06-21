@@ -1,11 +1,11 @@
 use dependencies_sync::log::debug;
 use dependencies_sync::parking_lot::RwLock;
-use std::collections::{BTreeMap};
+use dependencies_sync::rust_i18n::{self, t};
+
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
-
 use crate::dispatcher::EventDispatcher;
-
 
 type DispatcherType = Arc<EventDispatcher>;
 type DispatcherMapType = BTreeMap<String, DispatcherType>;

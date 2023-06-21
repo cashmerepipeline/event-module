@@ -2,6 +2,7 @@ use dependencies_sync::bson::{self};
 use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::log::debug;
 use dependencies_sync::tokio;
+use dependencies_sync::rust_i18n::{self, t};
 
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 

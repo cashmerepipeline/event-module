@@ -1,15 +1,12 @@
-
 use std::sync::Arc;
 
 use dependencies_sync::log::warn;
-
+use dependencies_sync::rust_i18n::{self, t};
 
 use crate::event_types_map::get_event_types_map;
 
-
 use crate::get_event_service_configs;
 use crate::protocols::EventType;
-
 
 pub fn register_event_type(new_event_type: EventType) -> Option<String> {
     let type_id = new_event_type.type_id.clone();
@@ -31,7 +28,7 @@ pub fn register_event_type(new_event_type: EventType) -> Option<String> {
     let type_id = new_event_type.type_id.clone();
     let new_type = Arc::new(new_event_type);
     event_types_map.insert(type_id.clone(), new_type);
-    
+
     #[cfg(feature = "use_channel_dispatch")]
     {
         use crate::dispatch_channels::create_dispatch_channel;

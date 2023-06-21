@@ -1,3 +1,4 @@
+use dependencies_sync::rust_i18n::{self, t};
 use dependencies_sync::{log::{warn, debug}, tokio};
 
 use crate::{

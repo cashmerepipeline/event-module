@@ -1,6 +1,9 @@
 use cash_result::{operation_failed, OperationResult};
 use configs::get_server_configs;
+
 use dependencies_sync::{bson};
+use dependencies_sync::rust_i18n::{self, t};
+
 use majordomo::get_majordomo;
 use manage_define::{
     cashmere::Name,

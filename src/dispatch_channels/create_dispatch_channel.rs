@@ -1,4 +1,5 @@
 use dependencies_sync::{tokio, log::{self, info}};
+use dependencies_sync::rust_i18n::{self, t};
 
 use crate::{event_services::get_event_runtime, dispatch_event::dispatch_event};
 

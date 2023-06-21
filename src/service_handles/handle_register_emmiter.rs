@@ -1,4 +1,5 @@
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
+use dependencies_sync::rust_i18n::{self, t};
 use dependencies_sync::bson;
 
 use majordomo::{self, get_majordomo};

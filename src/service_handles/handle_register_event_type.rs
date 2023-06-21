@@ -1,6 +1,7 @@
 use dependencies_sync::bson;
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 use dependencies_sync::futures::TryFutureExt;
+use dependencies_sync::rust_i18n::{self, t};
 
 use majordomo::{self, get_majordomo};
 

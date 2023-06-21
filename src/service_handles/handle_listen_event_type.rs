@@ -1,5 +1,6 @@
 use dependencies_sync::chrono::Utc;
 use dependencies_sync::log::debug;
+use dependencies_sync::rust_i18n::{self, t};
 
 use dependencies_sync::bson;
 use dependencies_sync::tokio;
