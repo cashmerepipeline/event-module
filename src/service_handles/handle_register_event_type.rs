@@ -1,7 +1,7 @@
 use dependencies_sync::bson;
-use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::rust_i18n::{self, t};
+use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 
 use majordomo::{self, get_majordomo};
 
@@ -14,7 +14,7 @@ use request_utils::request_account_context;
 use service_utils::types::UnaryResponseResult;
 use service_utils::validate_name;
 
-use crate::event_types_map::register_event_type;
+use crate::event_services::{register_event_type, has_max_evnet_type_count_reached};
 use crate::ids_codes::field_ids::*;
 use crate::ids_codes::manage_ids::*;
 use crate::protocols::*;
@@ -38,11 +38,9 @@ async fn validate_view_rulse(
     #[cfg(feature = "view_rules_validate")]
     {
         let (_account_id, _groups, role_group) = request_account_context(request.metadata());
-        if let Err(e) = view::validates::validate_collection_can_write(
-            &EVENT_TYPES_MANAGE_ID,
-            &role_group,
-        )
-        .await
+        if let Err(e) =
+            view::validates::validate_collection_can_write(&EVENT_TYPES_MANAGE_ID, &role_group)
+                .await
         {
             return Err(e);
         }
@@ -54,6 +52,15 @@ async fn validate_view_rulse(
 async fn validate_request_params(
     request: Request<RegisterEventTypeRequest>,
 ) -> Result<Request<RegisterEventTypeRequest>, Status> {
+    let name = &request.get_ref().name;
+    if validate_name(name).is_err() {
+        return Err(Status::data_loss(format!(
+            "{}{}",
+            t!("事件类型"),
+            t!("名字不能为空")
+        )));
+    }
+
     Ok(request)
 }
 
@@ -66,19 +73,19 @@ async fn handle_register_event_type(
     let has_echo = &request.get_ref().has_echo;
     let description = &request.get_ref().description;
 
-    if validate_name(name).is_err() {
-        return Err(Status::data_loss(format!(
-            "{}{}",
-            t!("事件类型"),
-            t!("名字不能为空")
-        )));
-    }
     let name = name.as_ref().unwrap();
 
     let majordomo_arc = get_majordomo();
     let manager = majordomo_arc
         .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
         .unwrap();
+    
+    // 检查类型注册数量是否已经最大
+    if has_max_evnet_type_count_reached() {
+        return Err(Status::aborted(
+            format!("{}", t!("监听事件类型超出最大限制")),
+        ));
+    }
 
     // 新建条目
     let mut new_entity_doc = if let Some(r) = make_new_entity_document(&manager).await {

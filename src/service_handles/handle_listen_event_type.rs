@@ -3,10 +3,10 @@ use dependencies_sync::log::debug;
 use dependencies_sync::rust_i18n::{self, t};
 
 use dependencies_sync::bson;
+use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::tokio;
 use dependencies_sync::tokio_stream;
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
-use dependencies_sync::futures::TryFutureExt;
 
 use majordomo::{self, get_majordomo};
 
@@ -19,6 +19,9 @@ use request_utils::request_account_context;
 use service_utils::types::{ResponseStream, StreamResponseResult};
 
 use crate::event_inner_wrapper::EventInnerWrapper;
+use crate::event_services::{
+    has_max_evnet_type_count_reached, has_max_listener_instance_count_reached,
+};
 use crate::event_types_map::get_event_type;
 use crate::ids_codes::field_ids::*;
 use crate::ids_codes::manage_ids::*;
@@ -49,21 +52,32 @@ async fn validate_request_params(
     request: Request<ListenEventTypeRequest>,
 ) -> Result<Request<ListenEventTypeRequest>, Status> {
     debug!("{}: {}", t!("验证参数"), EVENT_TYPES_MANAGE_ID);
+
+    let type_id = &request.get_ref().type_id;
+    // 事件类型存在检查
+    if get_event_type(type_id).await.is_none() {
+        return Err(Status::not_found(t!("事件类型不存在")));
+    }
+
     Ok(request)
 }
 
 async fn handle_listen_event_type(
     request: Request<ListenEventTypeRequest>,
-) -> StreamResponseResult<ListenEventTypeResponse>{
+) -> StreamResponseResult<ListenEventTypeResponse> {
     let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
 
     let listener_id = &request.get_ref().listener_id;
     let type_id = &request.get_ref().type_id;
     let instance_name = &request.get_ref().instance_name;
 
-    // 事件类型存在检查
-    if get_event_type(type_id).await.is_none() {
-        return Err(Status::not_found(t!("事件类型不存在")));
+    // 检查是否达到最大监听者实例限制
+    if has_max_listener_instance_count_reached(listener_id) {
+        return Err(Status::aborted(format!(
+            "{}: {}",
+            t!("超过最大监听者实例限制"),
+            listener_id
+        )));
     }
 
     let majordomo_arc = get_majordomo();

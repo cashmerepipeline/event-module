@@ -14,7 +14,7 @@ pub async fn initialize_event_service(configs: EventServiceConfigs) -> Result<()
     init_event_service_configs(configs.clone());
 
     // 最多同时并发队列
-    let _max_envent_queue_size = configs.max_event_type_queue_size;
+    let _max_envent_queue_size = configs.max_event_type_count;
 
     init_event_types_map().await?;
 

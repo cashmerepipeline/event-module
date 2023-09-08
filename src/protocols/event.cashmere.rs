@@ -186,7 +186,7 @@ pub struct DeregisterEventEmitterResponse {
     #[prost(string, tag = "1")]
     pub result: ::prost::alloc::string::String,
 }
-/// 注册发送者， 发送者需要先注册，然后才能上线
+/// 注册监听者
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RegisterEventListenerRequest {

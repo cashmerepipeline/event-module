@@ -14,7 +14,7 @@ use managers::ManagerTrait;
 use crate::ids_codes::{manage_ids::EVENT_TYPES_MANAGE_ID};
 use crate::protocols::EventType;
 
-use super::register_event_type;
+use crate::event_services::register_event_type;
 
 pub async fn init_event_types_map() -> Result<(), OperationResult> {
     let majordomo = get_majordomo();

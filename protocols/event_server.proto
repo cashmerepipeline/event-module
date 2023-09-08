@@ -55,7 +55,7 @@ message DeregisterEventEmitterResponse {
     string result = 1;
 }
 
-// 注册发送者， 发送者需要先注册，然后才能上线
+// 注册监听者
 message RegisterEventListenerRequest {
   // 不能重名
   string event_type = 1;
