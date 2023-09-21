@@ -53,7 +53,7 @@ async fn validate_request_params(
     request: Request<RegisterEventTypeRequest>,
 ) -> Result<Request<RegisterEventTypeRequest>, Status> {
     let name = &request.get_ref().name;
-    if validate_name(name).is_err() {
+    if !validate_name(name) {
         return Err(Status::data_loss(format!(
             "{}{}",
             t!("事件类型"),

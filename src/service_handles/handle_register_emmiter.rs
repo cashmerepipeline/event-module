@@ -28,7 +28,7 @@ pub trait HandleRegisterEventEmitter {
         let name = &request.get_ref().name;
         let description = &request.get_ref().description;
 
-        if validate_name(name).is_err() {
+        if !validate_name(name) {
             return Err(Status::data_loss(t!("名字不能为空")));
         }
         let name = name.as_ref().unwrap();
