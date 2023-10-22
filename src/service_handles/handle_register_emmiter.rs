@@ -4,7 +4,7 @@ use dependencies_sync::bson;
 
 use majordomo::{self, get_majordomo};
 use manage_define::general_field_ids::*;
-use managers::traits::ManagerTrait;
+use managers::ManagerTrait;
 use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
 
@@ -39,7 +39,7 @@ pub trait HandleRegisterEventEmitter {
             .unwrap();
 
         // 新建条目
-        let mut new_entity_doc = if let Some(r) = make_new_entity_document(&manager).await {
+        let mut new_entity_doc = if let Some(r) = make_new_entity_document(&manager, &account_id).await {
             r
         } else {
             return Err(Status::aborted(format!(

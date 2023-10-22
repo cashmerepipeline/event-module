@@ -10,7 +10,7 @@ use majordomo::{self, get_majordomo};
 
 use manage_define::general_field_ids::*;
 
-use managers::traits::ManagerTrait;
+use managers::ManagerTrait;
 
 use request_utils::request_account_context;
 use view;
