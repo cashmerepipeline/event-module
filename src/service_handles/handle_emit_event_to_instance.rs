@@ -1,8 +1,8 @@
 use dependencies_sync::bson::{self};
 use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::log::debug;
-use dependencies_sync::tokio;
 use dependencies_sync::rust_i18n::{self, t};
+use dependencies_sync::tokio;
 
 use dependencies_sync::tonic::{async_trait, Request, Response, Status};
 
@@ -100,15 +100,17 @@ async fn handle_emit_event_to_instance(
         .unwrap();
 
     // 存在检查
-    if !emitter_manager
+    if emitter_manager
         .entity_exists(&bson::doc! {ID_FIELD_ID.to_string():event.emitter_id.clone()})
         .await
+        .is_none()
     {
         return Err(Status::not_found(t!("发射者不存在")));
     }
-    if !event_type_manager
+    if event_type_manager
         .entity_exists(&bson::doc! {ID_FIELD_ID.to_string():event.type_id.clone()})
         .await
+        .is_none()
     {
         return Err(Status::not_found(t!("事件类型不存在")));
     }

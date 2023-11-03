@@ -3,9 +3,11 @@ use std::sync::Arc;
 use dependencies_sync::log::warn;
 use dependencies_sync::rust_i18n::{self, t};
 
+use configs::ConfigTrait;
+use crate::EventServiceConfigs;
+
 use crate::event_types_map::get_event_types_map;
 
-use crate::get_event_service_configs;
 use crate::protocols::EventType;
 
 pub fn register_event_type(new_event_type: EventType) -> Option<String> {
@@ -33,7 +35,7 @@ pub fn register_event_type(new_event_type: EventType) -> Option<String> {
     {
         use crate::dispatch_channels::create_dispatch_channel;
 
-        let buffer_size = get_event_service_configs().max_event_type_count as usize;
+        let buffer_size = EventServiceConfigs::get().max_event_type_count as usize;
         create_dispatch_channel(&type_id, buffer_size);
     }
 

@@ -3,20 +3,20 @@ use std::sync::Arc;
 use dependencies_sync::tokio;
 use dependencies_sync::tokio::runtime::Runtime;
 
-static mut NOTICE_RUNTIME: Option<Arc<Runtime>> = None;
+static mut EVENT_RUNTIME: Option<Arc<Runtime>> = None;
 
 pub fn get_event_runtime() -> Arc<Runtime> {
     unsafe {
-        if NOTICE_RUNTIME.is_some() {
-            NOTICE_RUNTIME.clone().unwrap()
+        if EVENT_RUNTIME.is_some() {
+            EVENT_RUNTIME.clone().unwrap()
         } else {
-            NOTICE_RUNTIME.get_or_insert(build_notice_runtime());
-            NOTICE_RUNTIME.clone().unwrap()
+            EVENT_RUNTIME.get_or_insert(build_event_runtime());
+            EVENT_RUNTIME.clone().unwrap()
         }
     }
 }
 
-pub fn build_notice_runtime() -> Arc<Runtime> {
+pub fn build_event_runtime() -> Arc<Runtime> {
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()

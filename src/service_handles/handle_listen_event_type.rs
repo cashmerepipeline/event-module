@@ -86,9 +86,10 @@ async fn handle_listen_event_type(
         .unwrap();
 
     // 存在检查
-    if !listener_manager
+    if listener_manager
         .entity_exists(&bson::doc! {ID_FIELD_ID.to_string():listener_id.clone()})
         .await
+        .is_none()
     {
         return Err(Status::not_found(t!("监听器不存在")));
     }
