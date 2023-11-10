@@ -7,7 +7,7 @@ use crate::event_service_configs::EventServiceConfigs;
 use crate::event_types_map::init_event_types_map;
 
 /// 初始化事件服务
-pub async fn initialize_event_service(configs: EventServiceConfigs) -> Result<(), OperationResult> {
+pub async fn initialize_event_service(configs: &EventServiceConfigs) -> Result<(), OperationResult> {
     info!("{}", t!("初始化事件服务"));
 
     // 最多同时并发队列

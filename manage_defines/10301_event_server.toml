@@ -1,44 +1,34 @@
 #
-# 事件发送者
-#
-# 用于事件发送权限控制
+# 事件服务
+# 
+# 不存存储数据，只用于权限控制
 
-id = 10020
-name_map = { zh = "事件发送者", en = "event_emitters" }
+id = 10301
+name_map = { zh = "事件服务", en = "event_server" }
+is_searchable = false
+
 
 # 数据描写 或者 模式
 schema = [
-  { data_type = "Int32", name_map = { zh = "事件类型", en = "type_id" }, removed = false },
-  { data_type = "List", name_map = { zh = "可发送事件类型", en = "emittable_event_types" }, removed = false },
+  # { data_type = "String", name_map = { zh = "事件", en = "event_id" }, removed = false },
+  # { data_type = "List", name_map = { zh = "类型表", en = "event_types" }, removed = false },
+  # { data_type = "List", name_map = { zh = "发送者表", en = "event_emitters" }, removed = false },
+  # { data_type = "List", name_map = { zh = "监听者表", en = "event_listeners" }, removed = false },
 ]
 
-
-# 关联管理
-manage = "String"
-# 目标队列
-target_queues = "List"
-# entry_id
-emitor = "String"
-
-# 事件队列和消息队列表
-[queues]
-
-# 事件定义, 不是必须
-[events]
-event_queue = []
-massage_queue = []
 
 # 初始实体
 [items]
 
 
 [view_rules]
+
 [view_rules.manage]
 10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
   "NoLimit",
 ], write_filters = [
 ] }
-10001 = { read_rule = "InVisible", write_rule = "InVisible", read_filters = [
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
   "NoLimit",
 ], write_filters = [
 ] }
@@ -47,7 +37,7 @@ massage_queue = []
   "NoLimit",
 ], write_filters = [
 ] }
-10001 = { read_rule = "InVisible", write_rule = "InVisible", read_filters = [
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
   "NoLimit",
 ], write_filters = [
 ] }
@@ -117,7 +107,7 @@ massage_queue = []
 ], write_filters = [
 ] }
 [view_rules.schema.1008]
-10000 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
   "NoLimit",
 ], write_filters = [
 ] }
@@ -159,3 +149,22 @@ massage_queue = []
 10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
 ], write_filters = [
 ] }
+[view_rules.schema.2002]
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
+  "NoLimit",
+], write_filters = [
+] }
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+], write_filters = [
+] }
+[view_rules.schema.2003]
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
+  "NoLimit",
+], write_filters = [
+] }
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+], write_filters = [
+] }
+# [view_rules.schema.scripts]
+# 10000 = { read_rule = "Read", write_rule = "Write", read_filters = [], write_filters = [] }
+# 10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [], write_filters = [] }

@@ -1,15 +1,17 @@
 #
-# 事件定义
+# 事件发送者
 #
-# 事件结构定义在 表 级
-# 事件由具体的记录发出，然后加入目标队列
+# 用于事件发送权限控制
 
-id = 10204
-name_map = { zh = "事件类型", en = "event_types" }
+id = 10303
+name_map = { zh = "事件发送者", en = "event_emitters" }
+is_searchable = true
+
 
 # 数据描写 或者 模式
 schema = [
-  { data_type = "Bool", name_map = { zh = "是否回馈", en = "has_echo" }, removed = false },
+  { data_type = "Int32", name_map = { zh = "事件类型", en = "type_id" }, removed = false },
+  { data_type = "List", name_map = { zh = "可发送事件类型", en = "emittable_event_types" }, removed = false },
 ]
 
 
@@ -33,7 +35,6 @@ massage_queue = []
 
 
 [view_rules]
-
 [view_rules.manage]
 10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
   "NoLimit",
@@ -126,7 +127,7 @@ massage_queue = []
 ], write_filters = [
 ] }
 [view_rules.schema.1009]
-10000 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
   "NoLimit",
 ], write_filters = [
 ] }

@@ -2,7 +2,7 @@ use dependencies_sync::bson;
 use std::sync::Arc;
 
 use manage_define::cashmere::Name;
-use manage_define::general_field_ids::{DESCRIPTIONS_FIELD_ID, NAME_MAP_FIELD_ID};
+use manage_define::general_field_ids::{DESCRIPTION_FIELD_ID, NAME_MAP_FIELD_ID};
 use managers::ManagerTrait;
 
 use crate::event_types_map::get_event_types_map;
@@ -37,7 +37,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
         .unwrap();
 
         let description = type_doc
-            .get_str(DESCRIPTIONS_FIELD_ID.to_string())
+            .get_str(DESCRIPTION_FIELD_ID.to_string())
             .unwrap()
             .to_owned();
 

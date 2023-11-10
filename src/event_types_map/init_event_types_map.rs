@@ -7,7 +7,7 @@ use dependencies_sync::rust_i18n::{self, t};
 use majordomo::get_majordomo;
 use manage_define::{
     cashmere::Name,
-    general_field_ids::{DESCRIPTIONS_FIELD_ID, ID_FIELD_ID, NAME_MAP_FIELD_ID},
+    general_field_ids::{DESCRIPTION_FIELD_ID, ID_FIELD_ID, NAME_MAP_FIELD_ID},
 };
 use managers::ManagerTrait;
 
@@ -41,7 +41,7 @@ pub async fn init_event_types_map() -> Result<(), OperationResult> {
         let _lang_code = &get_server_configs().language_code;
 
         let id = type_doc.get_str(ID_FIELD_ID.to_string()).unwrap();
-        let description = type_doc.get_str(DESCRIPTIONS_FIELD_ID.to_string()).unwrap();
+        let description = type_doc.get_str(DESCRIPTION_FIELD_ID.to_string()).unwrap();
 
         let name: Name = bson::from_document(
             type_doc

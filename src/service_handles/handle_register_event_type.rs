@@ -103,7 +103,7 @@ async fn handle_register_event_type(
         bson::to_document(name).unwrap(),
     );
     new_entity_doc.insert(EVENT_TYPES_HAS_ECHO_FIELD_ID.to_string(), *has_echo);
-    new_entity_doc.insert(DESCRIPTIONS_FIELD_ID.to_string(), description.clone());
+    new_entity_doc.insert(DESCRIPTION_FIELD_ID.to_string(), description.clone());
     let new_id = new_entity_doc
         .get_str(ID_FIELD_ID.to_string())
         .unwrap()
