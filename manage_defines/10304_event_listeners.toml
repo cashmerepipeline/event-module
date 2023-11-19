@@ -6,12 +6,13 @@
 id = 10304
 name_map = { zh = "事情监听者", en = "event_listeners" }
 is_searchable = true
+description = ""
 
 
 # 数据描写 或者 模式
 schema = [
   { data_type = "Int32", name_map = { zh = "事件类型", en = "type_id" }, removed = false },
-  { data_type = "List", name_map = { zh = "可监听类", en = "listenable_types" }, removed = false },
+  { data_type = "Array", name_map = { zh = "可监听类", en = "listenable_types" }, removed = false },
 ]
 
 
@@ -162,3 +163,22 @@ massage_queue = []
 ], write_filters = [
 ] }
 
+[view_rules.schema.2002]
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
+  "NoLimit",
+], write_filters = [
+] }
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+], write_filters = [
+] }
+
+[view_rules.schema.1200]
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
+  "NoLimit",
+], write_filters = [
+] }
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+  "NoLimit",
+], write_filters = [
+  "OnlyOwner",
+] }

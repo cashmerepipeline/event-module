@@ -35,7 +35,7 @@ async fn validate_view_rules(
     #[cfg(feature = "validate_view_rules")]
     {
         let manage_id = EVENT_TYPES_MANAGE_ID;
-        let (account_id, _groups, role_group) = request_account_context(request.metadata());
+        let (account_id, _groups, role_group) = request_account_context(request.metadata())?;
         if let Err(e) = view::validates::validate_collection_can_read(&manage_id, &role_group).await
         {
             return Err(e);
@@ -54,7 +54,7 @@ async fn validate_request_params(
 async fn handle_list_event_types(
     request: Request<ListEventTypesRequest>,
 ) -> Result<Response<ListEventTypesResponse>, Status> {
-    let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
+    let (_account_id, _groups, _role_group) = request_account_context(request.metadata())?;
 
     let majordomo_arc = get_majordomo();
     let _manager = majordomo_arc

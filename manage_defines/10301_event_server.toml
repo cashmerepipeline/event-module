@@ -6,14 +6,14 @@
 id = 10301
 name_map = { zh = "事件服务", en = "event_server" }
 is_searchable = false
-
+description = ""
 
 # 数据描写 或者 模式
 schema = [
   # { data_type = "String", name_map = { zh = "事件", en = "event_id" }, removed = false },
-  # { data_type = "List", name_map = { zh = "类型表", en = "event_types" }, removed = false },
-  # { data_type = "List", name_map = { zh = "发送者表", en = "event_emitters" }, removed = false },
-  # { data_type = "List", name_map = { zh = "监听者表", en = "event_listeners" }, removed = false },
+  # { data_type = "Array", name_map = { zh = "类型表", en = "event_types" }, removed = false },
+  # { data_type = "Array", name_map = { zh = "发送者表", en = "event_emitters" }, removed = false },
+  # { data_type = "Array", name_map = { zh = "监听者表", en = "event_listeners" }, removed = false },
 ]
 
 
@@ -168,3 +168,14 @@ schema = [
 # [view_rules.schema.scripts]
 # 10000 = { read_rule = "Read", write_rule = "Write", read_filters = [], write_filters = [] }
 # 10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [], write_filters = [] }
+
+[view_rules.schema.1200]
+10000 = { read_rule = "Read", write_rule = "Write", read_filters = [
+  "NoLimit",
+], write_filters = [
+] }
+10001 = { read_rule = "Read", write_rule = "InVisible", read_filters = [
+  "NoLimit",
+], write_filters = [
+  "OnlyOwner",
+] }

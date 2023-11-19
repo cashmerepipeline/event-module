@@ -22,7 +22,7 @@ pub trait HandleRegisterEventEmitter {
         &self,
         request: Request<RegisterEventEmitterRequest>,
     ) -> UnaryResponseResult<RegisterEventEmitterResponse> {
-        let (account_id, _groups, role_group) = request_account_context(request.metadata());
+        let (account_id, _groups, role_group) = request_account_context(request.metadata())?;
 
         let event_type = &request.get_ref().event_type;
         let name = &request.get_ref().name;

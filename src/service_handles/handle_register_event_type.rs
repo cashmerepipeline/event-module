@@ -37,7 +37,7 @@ async fn validate_view_rulse(
 ) -> Result<Request<RegisterEventTypeRequest>, Status> {
     #[cfg(feature = "view_rules_validate")]
     {
-        let (_account_id, _groups, role_group) = request_account_context(request.metadata());
+        let (_account_id, _groups, role_group) = request_account_context(request.metadata())?;
         if let Err(e) =
             view::validates::validate_collection_can_write(&EVENT_TYPES_MANAGE_ID, &role_group)
                 .await
@@ -67,7 +67,7 @@ async fn validate_request_params(
 async fn handle_register_event_type(
     request: Request<RegisterEventTypeRequest>,
 ) -> UnaryResponseResult<RegisterEventTypeResponse> {
-    let (account_id, _groups, role_group) = request_account_context(request.metadata());
+    let (account_id, _groups, role_group) = request_account_context(request.metadata())?;
 
     let name = &request.get_ref().name;
     let has_echo = &request.get_ref().has_echo;

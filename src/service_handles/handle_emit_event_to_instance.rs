@@ -44,7 +44,7 @@ async fn validate_view_rules(
     #[cfg(feature = "view_rules_validate")]
     {
         let manage_id = EVENT_EMITTERS_MANAGE_ID;
-        let (_account_id, _groups, role_group) = request_account_context(request.metadata());
+        let (_account_id, _groups, role_group) = request_account_context(request.metadata())?;
         view::validates::validate_collection_can_read(&manage_id, &role_group).await?;
     }
 
@@ -69,7 +69,7 @@ async fn validate_request_params(
 async fn handle_emit_event_to_instance(
     request: Request<EmitEventToInstanceRequest>,
 ) -> UnaryResponseResult<EmitEventResponse> {
-    let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
+    let (_account_id, _groups, _role_group) = request_account_context(request.metadata())?;
 
     let event = &request.get_ref().event;
     let listener_id = &request.get_ref().listener_id;

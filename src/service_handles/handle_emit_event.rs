@@ -57,7 +57,7 @@ async fn handle_emit_event(
 ) -> StreamResponseResult<EmitEventResponse> {
     debug!("{}: {}", t!("处理请求"), EVENT_TYPES_MANAGE_ID);
 
-    let (_account_id, _groups, _role_group) = request_account_context(request.metadata());
+    let (_account_id, _groups, _role_group) = request_account_context(request.metadata())?;
 
     let event = &request.get_ref().event;
 
