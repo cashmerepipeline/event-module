@@ -12,7 +12,7 @@ use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
 
 use service_utils::types::UnaryResponseResult;
-use service_utils::validate_name;
+use validates::validate_name;
 
 use crate::event_services::{register_event_type, has_max_evnet_type_count_reached};
 use crate::ids_codes::field_ids::*;
@@ -53,14 +53,8 @@ async fn validate_request_params(
     request: Request<RegisterEventTypeRequest>,
 ) -> Result<Request<RegisterEventTypeRequest>, Status> {
     let name = &request.get_ref().name;
-    if !validate_name(name) {
-        return Err(Status::data_loss(format!(
-            "{}{}",
-            t!("事件类型"),
-            t!("名字不能为空")
-        )));
-    }
-
+    validate_name(name)?;
+    
     Ok(request)
 }
 
