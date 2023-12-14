@@ -95,7 +95,7 @@ async fn handle_listen_event_type(
     }
 
     // 检查是否可监听
-    let listener_entity = match listener_manager.get_entity_by_id(listener_id).await {
+    let listener_entity = match listener_manager.get_entity_by_id(listener_id, &vec![]).await {
         Ok(r) => r,
         Err(e) => {
             return Err(Status::aborted(format!(
