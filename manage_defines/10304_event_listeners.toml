@@ -3,9 +3,8 @@
 #
 # 用于事件监听控制
 
-id = 10304
+id = "事件监听者"
 name_map = { zh = "事情监听者", en = "event_listeners" }
-is_searchable = true
 description = ""
 
 

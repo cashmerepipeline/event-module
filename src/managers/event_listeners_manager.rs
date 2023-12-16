@@ -53,7 +53,7 @@ impl ManagerTrait for EventListenersManager {
         ))
     }
 
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> &'static str {
         EVENT_LISTENERS_MANAGE_ID
     }
 

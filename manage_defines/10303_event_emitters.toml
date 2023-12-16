@@ -3,9 +3,8 @@
 #
 # 用于事件发送权限控制
 
-id = 10303
+id = "事件发送者"
 name_map = { zh = "事件发送者", en = "event_emitters" }
-is_searchable = true
 description = ""
 
 # 数据描写 或者 模式

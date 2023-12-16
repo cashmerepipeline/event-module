@@ -52,7 +52,7 @@ impl ManagerTrait for EventTypesManager {
         ))
     }
 
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> &'static str {
         EVENT_TYPES_MANAGE_ID
     }
 

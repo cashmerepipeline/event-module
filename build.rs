@@ -20,7 +20,7 @@ fn main() {
             "#[derive(serde::Serialize, serde::Deserialize)]",
         )
         .compile(
-            &["protocols/event_proto.proto"],
+            &["protocols/event_module.proto"],
             &["protocols", "../cashmere_core/protocols"],
         )
         .unwrap();

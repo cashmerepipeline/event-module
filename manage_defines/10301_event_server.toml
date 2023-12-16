@@ -3,9 +3,8 @@
 # 
 # 不存存储数据，只用于权限控制
 
-id = 10301
+id = "事件服务"
 name_map = { zh = "事件服务", en = "event_server" }
-is_searchable = false
 description = ""
 
 # 数据描写 或者 模式

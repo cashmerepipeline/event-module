@@ -4,9 +4,8 @@
 # 事件结构定义在 表 级
 # 事件由具体的记录发出，然后加入目标队列
 
-id = 10302
+id = "事件类型"
 name_map = { zh = "事件类型", en = "event_types" }
-is_searchable = true
 description = ""
 
 # 数据描写 或者 模式
