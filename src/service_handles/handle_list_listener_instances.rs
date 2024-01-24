@@ -55,7 +55,7 @@ async fn handle_list_listener_instances(
         .map(|(_instance_id, instance_inner)| {
             let instance_inner = instance_inner.as_ref().unwrap();
             let name = instance_inner.name.clone();
-            let index = instance_inner.index.clone();
+            let index = instance_inner.index;
 
             ListenerInstance { name, index }
         })

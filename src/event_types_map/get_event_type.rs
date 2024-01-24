@@ -27,7 +27,7 @@ pub async fn get_event_type(type_id: &String) -> Option<Arc<EventType>> {
         majar.get_manager_by_id(EVENT_TYPES_MANAGE_ID).unwrap()
     };
 
-    if let Ok(type_doc) = manager.get_entity_by_id(type_id, &vec![]).await {
+    if let Ok(type_doc) = manager.get_entity_by_id(type_id, &vec![], &vec![]).await {
         let name: Name = bson::from_document(
             type_doc
                 .get_document(NAME_MAP_FIELD_ID.to_string())

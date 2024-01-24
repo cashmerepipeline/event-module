@@ -2,17 +2,14 @@ use std::ops::Deref;
 
 use dependencies_sync::tonic::async_trait;
 
-
 use dependencies_sync::futures::TryFutureExt;
 use dependencies_sync::tonic::{Request, Response, Status};
 
-
 use majordomo::{self, get_majordomo};
-
 
 use request_utils::request_account_context;
 
-use crate::event_types_map::{get_event_types};
+use crate::event_types_map::get_event_types;
 use crate::ids_codes::manage_ids::EVENT_TYPES_MANAGE_ID;
 use crate::protocols::*;
 
@@ -67,7 +64,5 @@ async fn handle_list_event_types(
         .map(|event_type_arc| event_type_arc.deref().clone())
         .collect();
 
-    Ok(Response::new(ListEventTypesResponse {
-        event_types: event_types,
-    }))
+    Ok(Response::new(ListEventTypesResponse { event_types }))
 }

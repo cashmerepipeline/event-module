@@ -1,9 +1,17 @@
+use dependencies_sync::log;
 use dependencies_sync::rust_i18n::{self, t};
-use dependencies_sync::{log::{warn, debug}, tokio};
+use dependencies_sync::{
+    log::{debug, warn},
+    tokio,
+};
+use server_utils::get_shutdown_cancellation_token;
 
+use crate::event_services::is_event_runtime_shutdowned;
 use crate::{
-    event_inner_wrapper::EventInnerWrapper, event_type_listeners_map::get_event_type_listener_map,
-    listener_instances_map::{remove_listener_senders, get_listener_instance_map}, event_services::get_event_runtime,
+    event_inner_wrapper::EventInnerWrapper,
+    event_services::get_event_runtime,
+    event_type_listeners_map::get_event_type_listener_map,
+    listener_instances_map::{get_listener_instance_map, remove_listener_senders},
 };
 
 pub fn dispatch_event(event_type_id: String, event_echo_wrapper: EventInnerWrapper) {
@@ -58,6 +66,8 @@ pub fn dispatch_event(event_type_id: String, event_echo_wrapper: EventInnerWrapp
                 let event_echo_wrapper = event_echo_wrapper.clone();
 
                 let rt = get_event_runtime();
+                let shutdow_cancelation = get_shutdown_cancellation_token();
+
                 rt.spawn(async move {
                     let max_retry_times = 5;
                     let mut retry_times = 1;
@@ -78,7 +88,13 @@ pub fn dispatch_event(event_type_id: String, event_echo_wrapper: EventInnerWrapp
                             tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
                             retry_times += 1;
                         }
+
+                        if shutdow_cancelation.is_cancelled() {
+                            break;
+                        }
                     }
+                    
+                    log::info!("{}: {}", t!("退出监听发送队列"), type_id);
                 });
             }
         }

@@ -69,7 +69,7 @@ async fn handle_register_event_listener(
         .unwrap();
 
     // 新建条目
-    let mut new_entity_doc = if let Some(r) = make_new_entity_document(&manager, &account_id).await
+    let mut new_entity_doc = if let Ok(r) = make_new_entity_document(&manager, &account_id).await
     {
         r
     } else {

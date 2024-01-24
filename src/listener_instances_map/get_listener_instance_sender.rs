@@ -1,4 +1,3 @@
-
 use dependencies_sync::tokio::sync::mpsc::Sender;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
@@ -13,13 +12,7 @@ pub fn get_listener_instance_sender(
     let instance_index_sender_map = instance_index_sender_map.read();
 
     match instance_index_sender_map.get(&instance_index) {
-        Some(r) =>{
-            if let Some(r) = r {
-                return Some(r.sender.clone());
-            } else {
-                return None;
-            }
-        },
+        Some(r) => r.as_ref().map(|r| r.sender.clone()),
         None => None,
     }
 }

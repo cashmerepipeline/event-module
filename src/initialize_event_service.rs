@@ -4,6 +4,7 @@ use dependencies_sync::rust_i18n::{self, t};
 use dependencies_sync::log::info;
 
 use crate::event_service_configs::EventServiceConfigs;
+use crate::event_services::get_event_runtime;
 use crate::event_types_map::init_event_types_map;
 
 /// 初始化事件服务
@@ -14,6 +15,8 @@ pub async fn initialize_event_service(configs: &EventServiceConfigs) -> Result<(
     let _max_envent_queue_size = configs.max_event_type_count;
 
     init_event_types_map().await?;
+    
+    let _ = get_event_runtime();
 
     #[cfg(feature = "use_queue_dispatch")]
     {

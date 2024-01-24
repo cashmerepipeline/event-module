@@ -1,7 +1,8 @@
-use dependencies_sync::log::info;
+use dependencies_sync::log::{self, info};
 use dependencies_sync::rust_i18n::{self, t};
 
 use dependencies_sync::tokio::sync::mpsc::{channel, Sender};
+use server_utils::get_shutdown_cancellation_token;
 
 use crate::event_inner_wrapper::EventInnerWrapper;
 use crate::event_services::get_event_runtime;
@@ -33,6 +34,7 @@ impl EventDispatcher {
 
         // 事件转发线程
         let rt = get_event_runtime();
+        let shutdown_cancelation = get_shutdown_cancellation_token();
 
         rt.spawn(async move {
             while let Some(event_wrapper) = dispatch_reciever.recv().await {
@@ -47,9 +49,18 @@ impl EventDispatcher {
                     use crate::dispatch_channels::dispatch_to_channel;
                     dispatch_to_channel(event_wrapper).await;
                 }
+
+                if shutdown_cancelation.is_cancelled() {
+                    log::warn!(
+                        "{}: {}",
+                        t!("开始退出分发循环，所有未发送的事件将取消发送"),
+                        type_id
+                    );
+                    break;
+                }
             }
 
-            info!("EventDispatcher: {} is closed", type_id);
+            info!("{}: {}", t!("事件发送器关闭"), type_id);
         });
 
         new_dispatcher

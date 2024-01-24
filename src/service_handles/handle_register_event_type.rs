@@ -7,14 +7,14 @@ use majordomo::{self, get_majordomo};
 
 use manage_define::general_field_ids::*;
 
-use managers::ManagerTrait;
 use managers::utils::make_new_entity_document;
+use managers::ManagerTrait;
 use request_utils::request_account_context;
 
 use service_utils::types::UnaryResponseResult;
 use validates::validate_name;
 
-use crate::event_services::{register_event_type, has_max_evnet_type_count_reached};
+use crate::event_services::{has_max_evnet_type_count_reached, register_event_type};
 use crate::ids_codes::field_ids::*;
 use crate::ids_codes::manage_ids::*;
 use crate::protocols::*;
@@ -54,7 +54,7 @@ async fn validate_request_params(
 ) -> Result<Request<RegisterEventTypeRequest>, Status> {
     let name = &request.get_ref().name;
     validate_name(name)?;
-    
+
     Ok(request)
 }
 
@@ -73,16 +73,15 @@ async fn handle_register_event_type(
     let manager = majordomo_arc
         .get_manager_by_id(EVENT_TYPES_MANAGE_ID)
         .unwrap();
-    
+
     // 检查类型注册数量是否已经最大
     if has_max_evnet_type_count_reached() {
-        return Err(Status::aborted(
-            format!("{}", t!("监听事件类型超出最大限制")),
-        ));
+        return Err(Status::aborted(t!("监听事件类型超出最大限制").to_string()));
     }
 
     // 新建条目
-    let mut new_entity_doc = if let Some(r) = make_new_entity_document(&manager, &account_id).await {
+    let mut new_entity_doc = if let Ok(r) = make_new_entity_document(&manager, &account_id).await
+    {
         r
     } else {
         return Err(Status::aborted(format!(
@@ -114,10 +113,10 @@ async fn handle_register_event_type(
         .await;
 
     match result {
-        Ok(_r) => {
+        Ok(r) => {
             // 更新缓存
             let new_event_type = EventType {
-                type_id: new_id.to_string(),
+                type_id: r.clone(),
                 name: Some(name.clone()),
                 description: description.clone(),
             };
@@ -132,7 +131,7 @@ async fn handle_register_event_type(
             };
 
             Ok(Response::new(RegisterEventTypeResponse {
-                result: new_id.to_string(),
+                result: r,
             }))
         }
         Err(e) => Err(Status::aborted(format!(

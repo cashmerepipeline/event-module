@@ -11,9 +11,5 @@ pub fn has_max_evnet_type_count_reached() -> bool {
         event_types_map.len()
     };
 
-    if current_type_count >= max_types_count {
-        true
-    } else {
-        false
-    }
+    current_type_count >= max_types_count
 }

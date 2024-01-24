@@ -13,7 +13,6 @@ use manage_define::general_field_ids::*;
 use managers::ManagerTrait;
 
 use request_utils::request_account_context;
-use view;
 
 use service_utils::types::UnaryResponseResult;
 
@@ -116,7 +115,10 @@ async fn handle_emit_event_to_instance(
     }
 
     // 检查是否可发送
-    let emitter_entity = match emitter_manager.get_entity_by_id(&event.emitter_id, &vec![]).await {
+    let emitter_entity = match emitter_manager
+        .get_entity_by_id(&event.emitter_id, &vec![], &vec![])
+        .await
+    {
         Ok(r) => r,
         Err(e) => {
             return Err(Status::aborted(format!(

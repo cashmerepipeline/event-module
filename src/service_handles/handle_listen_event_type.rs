@@ -19,9 +19,7 @@ use request_utils::request_account_context;
 use service_utils::types::{ResponseStream, StreamResponseResult};
 
 use crate::event_inner_wrapper::EventInnerWrapper;
-use crate::event_services::{
-    has_max_evnet_type_count_reached, has_max_listener_instance_count_reached,
-};
+use crate::event_services::has_max_listener_instance_count_reached;
 use crate::event_types_map::get_event_type;
 use crate::ids_codes::field_ids::*;
 use crate::ids_codes::manage_ids::*;
@@ -95,7 +93,10 @@ async fn handle_listen_event_type(
     }
 
     // 检查是否可监听
-    let listener_entity = match listener_manager.get_entity_by_id(listener_id, &vec![]).await {
+    let listener_entity = match listener_manager
+        .get_entity_by_id(listener_id, &vec![], &vec![])
+        .await
+    {
         Ok(r) => r,
         Err(e) => {
             return Err(Status::aborted(format!(
