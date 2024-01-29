@@ -28,6 +28,8 @@ fn main() {
     define_utils::generate_manage_defines(
         &["manage_defines"],
         "src/ids_codes",
+        // None,
         Some("dart_packages/event_module/lib"),
+        Some("event_module")
     );
 }
