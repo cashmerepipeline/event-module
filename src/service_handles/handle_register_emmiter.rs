@@ -5,7 +5,7 @@ use dependencies_sync::futures::TryFutureExt;
 
 use majordomo::{self, get_majordomo};
 use manage_define::general_field_ids::*;
-use managers::ManagerTrait;
+use managers::entity_interface::EntityInterface;
 use managers::utils::make_new_entity_document;
 use request_utils::request_account_context;
 
@@ -88,7 +88,7 @@ async fn handle_register_event_emitter(
     );
 
     new_entity_doc.insert(EVENT_EMITTERS_TYPE_ID_FIELD_ID.to_string(), event_type.clone());
-    new_entity_doc.insert(DESCRIPTION_FIELD_ID.to_string(), description.clone());
+    new_entity_doc.insert(DESCRIPTION_FIELD_ID.to_string(), bson::to_document(description).unwrap());
 
     let new_id = new_entity_doc
         .get_str(ID_FIELD_ID.to_string())

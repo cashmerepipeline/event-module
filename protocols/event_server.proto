@@ -17,7 +17,7 @@ message GetEventSystemConfigsResponse {
 message RegisterEventTypeRequest {
   .cashmere.Name name = 1;
   bool has_echo = 2;
-  string description = 3;
+  map<string, string> description = 3;
 }
 message RegisterEventTypeResponse {
   // 成功返回 type id
@@ -38,7 +38,7 @@ message RegisterEventEmitterRequest {
   // 不能重名
   string event_type = 1;
   .cashmere.Name name = 2;
-  string description = 3;
+  map<string, string> description = 3;
 
 }
 message RegisterEventEmitterResponse {
@@ -60,7 +60,7 @@ message RegisterEventListenerRequest {
   // 不能重名
   string event_type = 1;
   .cashmere.Name name = 2;
-  string description = 3;
+  map<string, string> description = 3;
 
 }
 message RegisterEventListenerResponse {

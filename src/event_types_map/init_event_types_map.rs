@@ -9,7 +9,7 @@ use manage_define::{
     cashmere::Name,
     general_field_ids::{DESCRIPTION_FIELD_ID, ID_FIELD_ID, NAME_MAP_FIELD_ID},
 };
-use managers::ManagerTrait;
+use managers::entity_interface::EntityInterface;
 
 use crate::ids_codes::{manage_ids::EVENT_TYPES_MANAGE_ID};
 use crate::protocols::EventType;
@@ -41,7 +41,7 @@ pub async fn init_event_types_map() -> Result<(), OperationResult> {
         let _lang_code = &get_server_configs().language_code;
 
         let id = type_doc.get_str(ID_FIELD_ID.to_string()).unwrap();
-        let description = type_doc.get_str(DESCRIPTION_FIELD_ID.to_string()).unwrap();
+        let description = type_doc.get_document(DESCRIPTION_FIELD_ID.to_string()).unwrap().to_owned();
 
         let name: Name = bson::from_document(
             type_doc
@@ -54,7 +54,7 @@ pub async fn init_event_types_map() -> Result<(), OperationResult> {
         let event_type = EventType {
             name: Some(name),
             type_id: id.to_string(),
-            description: description.to_string(),
+            description: bson::from_document(description).unwrap(),
         };
 
         register_event_type(event_type);
